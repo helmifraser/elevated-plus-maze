@@ -12,5 +12,5 @@
 using namespace webots;
 
 #define TIME_STEP 8
-#define PS_THRESHOLD 200
+#define PS_THRESHOLD 150
 #define WHEEL_SPEED 1000

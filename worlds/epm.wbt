@@ -11,12 +11,12 @@ Background {
   ]
 }
 E-puck {
-  hidden translation_1 -0.026001326 0.02003404 -4.132979e-06
-  hidden rotation_1 0.99999983 -0.00056376582 -0.00014650244 -0.61188837
-  hidden translation_2 0.026000519 0.020033923 -3.7731726e-06
-  hidden rotation_2 0.99999998 6.4922095e-05 -0.00018430508 -2.8097637
-  translation 0.00021600275 0.49490312 -0.18470547
-  rotation -0.99997623 -0.00016298327 -0.0068924168 -0.00012998979
+  hidden translation_1 -0.026001327 0.020037563 -4.1331439e-06
+  hidden rotation_1 0.99999998 -0.00011998371 0.00013184089 -2.7852671
+  hidden translation_2 0.02600052 0.020037455 -3.7733378e-06
+  hidden rotation_2 0.99999996 0.00021730119 -0.00015771393 -1.601178
+  translation 0.01966074 0.49489985 -0.12169895
+  rotation 6.9063169e-06 1 -1.4755349e-05 0.05205819
   controller "objectAvoidance"
   name "rat boi"
 }
@@ -38,6 +38,7 @@ Group {
       translation 0 0.49 -0.56
       children [
         DEF Plank Solid {
+          translation 0.35 0 0
           children [
             Shape {
               appearance Appearance {
@@ -48,12 +49,32 @@ Group {
                 }
               }
               geometry Box {
-                size 1 0.001 0.1
+                size 0.5 0.001 0.15
               }
             }
           ]
           boundingObject Box {
-            size 1 0.01 0.1
+            size 0.5 0.01 0.15
+          }
+        }
+        DEF Plank2 Solid {
+          translation -0.35 0 0
+          children [
+            Shape {
+              appearance Appearance {
+                texture ImageTexture {
+                  url [
+                    "textures/steel_floor.jpg"
+                  ]
+                }
+              }
+              geometry Box {
+                size 0.5 0.001 0.15
+              }
+            }
+          ]
+          boundingObject Box {
+            size 0.5 0.01 0.15
           }
         }
         DEF Leg1 Solid {
@@ -101,7 +122,7 @@ Group {
           }
         }
         DEF Wall1 Solid {
-          translation -0.1 0.075 0.3
+          translation -0.1 0.075 0.32
           children [
             Shape {
               appearance Appearance {
@@ -134,7 +155,7 @@ Group {
           }
         }
         DEF Wall4 Solid {
-          translation -0.1 0.075 -0.3
+          translation -0.1 0.075 -0.32
           children [
             Shape {
               appearance Appearance {
@@ -167,7 +188,7 @@ Group {
           }
         }
         DEF Wall2 Solid {
-          translation 0.1 0.075 0.3
+          translation 0.1 0.075 0.32
           children [
             Shape {
               appearance Appearance {
@@ -200,7 +221,7 @@ Group {
           }
         }
         DEF Wall5 Solid {
-          translation 0.1 0.075 -0.3
+          translation 0.1 0.075 -0.32
           children [
             Shape {
               appearance Appearance {
@@ -233,7 +254,7 @@ Group {
           }
         }
         DEF Wall3 Solid {
-          translation -3.9816336e-05 0.075 0.54999998
+          translation -5.574287e-05 0.075 0.56999997
           rotation 0 1 0 1.57
           children [
             Shape {
@@ -267,7 +288,7 @@ Group {
           }
         }
         DEF Wall6 Solid {
-          translation 0.00083614305 0.075 -0.54999967
+          translation 0.00085206958 0.075 -0.56999966
           rotation 0 1 0 1.57
           children [
             Shape {
@@ -311,12 +332,12 @@ Group {
             }
           }
           geometry Box {
-            size 0.2 0.001 1.1
+            size 0.2 0.001 1.15
           }
         }
       ]
       boundingObject Box {
-        size 0.2 0.01 1.1
+        size 0.2 0.01 1.15
       }
     }
   ]
