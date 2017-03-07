@@ -39,7 +39,7 @@ public:
 
   void run() {
     while (step(TIME_STEP) != -1) {
-      std::cout << "Press 1 to object detection, 2 for teleop " << std::endl;
+      std::cout << "Press 1 to object detection, 2 for teleop, 3 for test " << std::endl;
       int decide = readKey();
       switch (decide) {
       case 49:
@@ -49,6 +49,17 @@ public:
       case 50:
         std::cout << "Teleop" << '\n';
         teleop();
+        break;
+
+      case 51:
+        std::cout << "Test distanceSensors" << std::endl;
+        std::vector<float> test = getDistanceValues();
+        std::cout << "Vector: ";
+        for (int i = 0; i < test.size(); i++) {
+          std::cout << test[i] << " ";
+        }
+        std::cout << std::endl;
+        distanceCheck();
         break;
       }
     }
@@ -204,6 +215,33 @@ public:
   double checkDistanceSensor(int n) { return distanceSensors[n]->getValue(); }
 
   int readKey() { return keyboard->getKey(); }
+
+  float scaleVal(float parameters[4], float value) {
+    float out = (((parameters[3] - parameters[2]) * (value - parameters[0])) /
+                 (parameters[1] - parameters[0])) +
+                parameters[2];
+
+    if (out > 2.5) {
+      out = 2.5;
+    } else if (out < -2.5) {
+      out = -2.5;
+    }
+
+    return out;
+  }
+
+  std::vector<float> getDistanceValues() {
+    std::vector<float> current;
+    float scaleParam[4] = {50, 1000, -2.5, 2.5};
+
+    for (int i = 0; i < 8; i++) {
+      float scaledVal = scaleVal(scaleParam, distanceSensors[i]->getValue());
+      current.push_back(scaledVal);
+    }
+
+    return current;
+  }
+
 };
 
 int main(int argc, char const *argv[]) {
