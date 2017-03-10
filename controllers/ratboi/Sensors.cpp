@@ -45,6 +45,11 @@ std::vector<float> getDistanceValues() {
   return current;
 }
 
+std::vector<float> getGroundSensorValues(){
+  std::vector<float> ground;
+  ground.clear();
+}
+
 std::vector<float> getGPSValues(){
     std::vector<float> position;
     const double *dataGPS = gps->getValues();

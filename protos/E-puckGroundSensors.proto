@@ -45,8 +45,8 @@ PROTO E-puckGroundSensors [
         ]
         name "gs0"
         lookupTable [
-          0 1000 0.1
-          0.016 300 0.1
+          0 1000 0.001
+          0.016 300 0.001
         ]
         type "infra-red"
       }
@@ -58,8 +58,8 @@ PROTO E-puckGroundSensors [
         ]
         name "gs1"
         lookupTable [
-          0 1000 0.1
-          0.016 300 0.1
+          0 1000 0.001
+          0.016 300 0.001
         ]
         type "infra-red"
       }
@@ -71,8 +71,8 @@ PROTO E-puckGroundSensors [
         ]
         name "gs2"
         lookupTable [
-          0 1000 0.1
-          0.016 300 0.1
+          0 1000 0.001
+          0.016 300 0.001
         ]
         type "infra-red"
       }

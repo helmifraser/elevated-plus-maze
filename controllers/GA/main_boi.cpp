@@ -1,36 +1,32 @@
 #include "GA.hpp"
+// #include <webots/DistanceSensor.hpp>
+
+void printIndividual(std::vector<std::vector<std::vector<float>>> individual){
+  std::cout << "Weights " << std::endl;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 8; j++) {
+      std::cout << individual[0][j][i] << " ";
+    }
+    std::cout  << std::endl;
+  }
+
+  std::cout << std::endl;
+}
 
 int main(int argc, char const *argv[]) {
 
   GA *test = new GA;
-  int map[15];
-  for (size_t i = 0; i < 15; i++) {
-    map [i] = 0;
-  }
+  srand(time(NULL));
+  std::vector<std::vector<std::vector<float>>> parentA = test->createIndividual();
+  std::vector<std::vector<std::vector<float>>> parentB = test->createIndividual();
+  std::cout << "here 2" << std::endl;
+  std::vector<std::vector<std::vector<float>>> child = test->child(parentA, parentB);
+  std::cout << "Created child" << std::endl;
 
-  float sumPoints = 0;
-  std::vector<float> empty = {0, 1, -1, 1, 0, 0.5, -0.5, 2};
+  printIndividual(parentA);
+  printIndividual(parentB);
+  printIndividual(child);
 
-  while (1) {
-    std::cout << "Enter x, then z" << std::endl;
-    float z_coord = 0;
-    float x_coord = 0;
-    std::cin >> x_coord;
-    std::cout << "z" << std::endl;
-    std::cin >> z_coord;
-
-    std::vector<float> test_coords = {x_coord, 0, z_coord};
-
-    int currentPos = test->position(test_coords);
-    std::cout << "position " << currentPos << std::endl;
-
-    test->updatePosition(map, currentPos);
-
-    sumPoints = test->fitnessEval(currentPos, sumPoints, empty);
-
-    std::cout << "Sum fitness: " << sumPoints << std::endl;
-
-  }
 
   return 0;
 }

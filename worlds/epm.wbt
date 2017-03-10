@@ -2,8 +2,8 @@
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.092988233 -0.9467231 -0.3083319 2.7475742
-  position -0.88246217 2.0360325 -2.5607478
+  orientation -0.10547891 -0.93082232 -0.34992 2.7377215
+  position -0.78717927 2.1092229 -2.3791504
 }
 Background {
   skyColor [
@@ -11,14 +11,18 @@ Background {
   ]
 }
 E-puck {
-  hidden translation_1 -0.026001327 0.020039872 -4.1331448e-06
-  hidden rotation_1 0.99999998 -0.00011998375 0.00013184089 -2.7852671
-  hidden translation_2 0.02600052 0.020039769 -3.7733387e-06
-  hidden rotation_2 0.99999996 0.00021730115 -0.00015771389 -1.601178
-  translation 0.01966074 0.4948987 -0.12169895
-  rotation 6.6247892e-06 1 -1.5844037e-05 0.05205819
-  controller "ratboi"
+  hidden translation_1 -0.026000717 0.020010627 -7.706938e-10
+  hidden rotation_1 1 8.8616894e-08 4.5068622e-06 -0.0030083208
+  hidden translation_2 0.026000719 0.02001057 5.3003879e-11
+  hidden rotation_2 0.23615149 0.00061116715 0.97171606 1.5421581e-08
+  translation 0.019660723 0.49492661 -0.12169931
+  rotation 0.0078144272 0.99996946 -8.3948734e-05 0.054179762
+  controller "objectAvoidance"
   name "rat boi"
+  groundSensorsSlot [
+    E-puckGroundSensors {
+    }
+  ]
 }
 PointLight {
   ambientIntensity 1
@@ -42,10 +46,8 @@ Group {
           children [
             Shape {
               appearance Appearance {
-                texture ImageTexture {
-                  url [
-                    "textures/steel_floor.jpg"
-                  ]
+                material Material {
+                  diffuseColor 0.5 0 0
                 }
               }
               geometry Box {
@@ -62,10 +64,8 @@ Group {
           children [
             Shape {
               appearance Appearance {
-                texture ImageTexture {
-                  url [
-                    "textures/steel_floor.jpg"
-                  ]
+                material Material {
+                  diffuseColor 0.5 0 0
                 }
               }
               geometry Box {
@@ -324,11 +324,7 @@ Group {
         DEF Floor Shape {
           appearance Appearance {
             material Material {
-            }
-            texture ImageTexture {
-              url [
-                "textures/steel_floor.jpg"
-              ]
+              diffuseColor 1 0 0
             }
           }
           geometry Box {

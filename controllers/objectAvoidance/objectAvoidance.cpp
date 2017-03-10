@@ -5,6 +5,7 @@ class objectAvoidance : public DifferentialWheels {
 private:
   DifferentialWheels *diffWheels;
   DistanceSensor *distanceSensors[8];
+  DistanceSensor *groundSensor[3];
   LED *leds[8];
   Keyboard *keyboard;
   GPS *gps;
@@ -29,12 +30,30 @@ public:
       leds[i] = getLED(led.replace(3, 1, std::to_string(i)));
     }
 
+    groundSensor[0] = getDistanceSensor("gs0");
+    groundSensor[0]->enable(TIME_STEP);
+    groundSensor[1] = getDistanceSensor("gs1");
+    groundSensor[1]->enable(TIME_STEP);
+    groundSensor[2] = getDistanceSensor("gs2");
+    groundSensor[2]->enable(TIME_STEP);
+
     gps = getGPS("gps");
     gps->enable(TIME_STEP);
 
     left_obstacle = right_obstacle = front_obstacle = back_obstacle = false;
     speed = {100, 50, 0};
     multiplier = 1;
+  }
+
+  std::vector<float> getGroundSensorValues(){
+    std::vector<float> ground;
+    ground.clear();
+
+    ground.push_back(groundSensor[0]->getValue());
+    ground.push_back(groundSensor[1]->getValue());
+    ground.push_back(groundSensor[2]->getValue());
+
+    return ground;
   }
 
   void run() {
@@ -53,13 +72,15 @@ public:
 
       case 51:
         std::cout << "Test distanceSensors" << std::endl;
-        std::vector<float> test = getDistanceValues();
-        std::cout << "Vector: ";
-        for (int i = 0; i < test.size(); i++) {
-          std::cout << test[i] << " ";
-        }
-        std::cout << std::endl;
-        distanceCheck();
+        // std::vector<float> test = getDistanceValues();
+        std::vector<float> test = getGroundSensorValues();
+        // float reading = groundSensor[0]->getValue();
+        std::cout << "Ground: " << test[0] << " " << test[1] << " " << test[2] << std::endl;
+        // for (int i = 0; i < test.size(); i++) {
+        //   std::cout << test[i] << " ";
+        // }
+        // std::cout << std::endl;
+        // distanceCheck();
         break;
       }
     }

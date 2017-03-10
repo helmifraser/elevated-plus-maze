@@ -1,5 +1,6 @@
 #include "neural_network.hpp"
 
+std::vector<float> v2 = {1, 1, 1, 1, 1, 1, 1, 1};
 std::vector<float> v3 = {1, 1, 1, 1, 1, 1, 1, 1};
 std::vector<float> v5 = {1, 1, 1, 1, 1, 1, 1, 1};
 std::vector<float> v6 = {1, 1, 1, 1, 1, 1, 1, 1};
@@ -11,7 +12,7 @@ std::vector<float> v10 = {1, 1, 1, 1};
 std::vector<float> v11 = {1, 1, 1, 1};
 
 std::vector<std::vector<float>> layer1weights = {v3, v5, v6, v7};
-std::vector<std::vector<float>> layer2weights = {v8, v9, v10, v11};
+std::vector<std::vector<float>> layer2weights = {v8, v9};
 std::vector<std::vector<std::vector<float>>> bigWeights = {layer1weights,
                                                            layer2weights};
 
@@ -34,29 +35,10 @@ float scaleVal(float parameters[4], float value) {
 }
 
 int main() {
-  // neural_network *myNet = new neural_network;
-  // std::cout << "I'm heeeere" << std::endl;
-  // std::vector<float> testOut = {1, 1, 1, 1, 1, 1, 1, 1};
-  //
-  // std::vector<float> layerTest = myNet->layerCalc(testOut, bigWeights, 0);
-  // std::vector<float> layer2 = myNet->layerCalc(layerTest, bigWeights, 1);
-  //
-  // std::cout << "layerTest: ";
-  // for (int i = 0; i < layerTest.size(); i++) {
-  //   std::cout << layerTest[i] << " ";
-  // }
-  // std::cout << std::endl;
-  //
-  // std::cout << "layer2: ";
-  // for (int i = 0; i < layer2.size(); i++) {
-  //   std::cout << layer2[i] << " ";
-  // }
-  // std::cout << std::endl;
-  float parametersTest[4] = {50, 1000, -2.5, 2.5};
-  // parametersTest[0] = 50;
-  // parametersTest[1] = 1000;
-  // parametersTest[2] = -2.5;
-  // parametersTest[3] = 2.5;
+  neural_network *myNet = new neural_network;
 
-  std::cout << "scale " << scaleVal(parametersTest, 525) << std::endl;
+  std::vector<float> myNetOut = myNet->getOutputs(v2, bigWeights);
+
+  std::cout << "myNetOut: " << myNetOut[0] << " " << myNetOut[0] << std::endl;
+
 }

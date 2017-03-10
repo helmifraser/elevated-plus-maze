@@ -7,3 +7,5 @@ test4 = [1, 1, 1, 1; 1, 1, 1, 1; 1, 1, 1, 1; 1, 1, 1, 1];
 v = test*test2
 
 v*test4
+
+layer1 = matrix(1,8)

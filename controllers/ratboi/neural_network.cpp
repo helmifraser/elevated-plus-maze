@@ -10,11 +10,10 @@ std::vector<float> neural_network::activationFunc(std::vector<float> input) {
   return out;
 }
 
-std::vector<float>
-neural_network::layerCalc(std::vector<float> nodeOutputs,
-          std::vector<std::vector<std::vector<float>>> weights, int layer) {
+std::vector<float> neural_network::layerCalc(std::vector<float> nodeOutputs,
+          std::vector<std::vector<float>> weightLayer) {
 
-  std::vector<std::vector<float>> current = weights[layer];
+  std::vector<std::vector<float>> current = weightLayer;
   std::vector<float> layerOutput;
   float sum = 0;
   for (int i = 0; i < current.size(); i++) {
@@ -25,5 +24,19 @@ neural_network::layerCalc(std::vector<float> nodeOutputs,
     std::cout << sum << std::endl;
     layerOutput.push_back(sum);
   }
-  return layerOutput;
+  return activationFunc(layerOutput);
+}
+
+std::vector<float> neural_network::getOutputs(std::vector<float> inputs, std::vector<std::vector<std::vector<float>>> weights) {
+  std::vector<float> firstLayer = activationFunc(inputs);
+
+  std::vector<float> hiddenLayer = layerCalc(firstLayer, weights[0]);
+
+  std::vector<float> outputLayer = layerCalc(hiddenLayer, weights[1]);
+
+  std::transform(outputLayer.begin(), outputLayer.end(), outputLayer.begin(),
+               std::bind1st(std::multiplies<float>(),1000));
+
+  return outputLayer;
+
 }
