@@ -1,7 +1,7 @@
-#include <Eigen/Dense>
 #include <array>
 #include <iostream>
 #include <cmath>
+#include "GA.hpp"
 
 class neural_network {
 private:

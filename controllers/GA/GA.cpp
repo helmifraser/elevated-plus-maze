@@ -1,4 +1,5 @@
 #include "GA.hpp"
+#include <algorithm>
 
 std::map<int, int> points = {{0, -10}, {1, 2},   {2, 2},   {3, 1},
                              {4, 2},   {5, 2},   {6, -1},  {7, -2},
@@ -18,21 +19,110 @@ std::map<std::string, float> sensorPoints = {{"reward", 0.5},
 //
 //     return position;
 // }
+void GA::printPopToFile(Population population) {
+  time_t now = time(0);
+  tm *ltm = localtime(&now);
+  std::string time_now =
+      std::to_string(ltm->tm_mday) + "-" + std::to_string(ltm->tm_hour) + ":" +
+      std::to_string(ltm->tm_min) + ":" + std::to_string(ltm->tm_sec);
+  std::string filename = time_now + "-allWeights.csv";
+  std::ofstream data(filename, std::ios::out);
 
-std::vector<std::vector<std::vector<std::vector<float>>>>
-GA::populate(int popsize) {
-  std::vector<std::vector<std::vector<std::vector<float>>>> population;
+  // get a test document
+  pugi::xml_document doc;
+
+  // tag::code[]
+  // save document to file
+  // end::code[]
+  // <name>weights0</name>
+  // <weights>[]</weights>
+  // <name>weight1</name>
+  // <weights>[]</weights>
+  // <name>weight2</name>
+  // <layer1>[[1,2,3,4]
+  //          [1,3,4,5]
+  //          [4,3,7,4]
+  //          [8,4,3,5]]
+  // </layer1>
+  // <layer2>[
+  //           [4,3,7,4],
+  //           [8,4,3,5]]
+  // </layer2>
+  std::string str;
+
+  str.append("<nodes>");
+  for (int i = 0; i < population.size(); i++) {
+    std::cout << i << std::endl;
+    // data << "Weights" << i << "=\"";
+    std::string weight = "<weights name=\"Weight " + std::to_string(i);
+    str.append(weight);
+    str.append("\"> \n");
+    str.append("<node>");
+    for (int j = 0; j < population[i].individual.size(); j++) {
+      std::string layer = "<layer" + std::to_string(j) + " val=\"";
+      str.append(layer);
+      for (int k = 0; k < population[i].individual[j][0].size(); k++) {
+        str.append("[");
+        for (int l = 0; l < population[i].individual[j].size(); l++) {
+          // data << population[i].individual[j][l][k] << ",";
+          std::string r =
+              std::to_string(population[i].individual[j][l][k]) + ",";
+          str.append(r);
+        }
+          str.append("]/");
+      }
+      std::string layerEnd = "]\" ";
+      std::string layer1 = "/>";
+      str.append(layerEnd);
+      str.append(layer1);
+    }
+    // std::string end= "/>";
+    // str.append(end);
+    std::string end1 = "</node>\n";
+    std::string end2 = "</weights>\n";
+    str.append(end1);
+    str.append(end2);
+  }
+  str.append("</nodes>");
+  doc.load_string(str.c_str());
+  std::cout << "Saving result: " << doc.save_file("save_file_output.xml")
+            << std::endl;
+}
+
+void GA::parseFile(std::string filename, int popsize){
+  pugi::xml_document doc;
+
+  pugi::xml_parse_result result = doc.load_file(filename.c_str());
+
+  for(int i = 0; i<popsize; i++)
+  {
+    std::cout << "Load result: " << result.description() << doc.child("nodes").child("weights").attribute("name").value() << std::endl;
+    std::cout << "Load result: " << result.description() << doc.child("nodes").child("weights").child("node").child("layer0").attribute("val").value() << std::endl;
+    std::cout << "Load result: " << result.description() << doc.child("nodes").child("weights").child("node").child("layer1").attribute("val").value() << std::endl;
+  }
+
+// end::code[]
+
+
+}
+
+Population GA::populate(int popsize) {
+  Population population;
   population.clear();
 
+  Genotype current;
+
   for (int i = 0; i < popsize; i++) {
-    population.push_back(createIndividual());
+    current.individual = createIndividual();
+    current.fitness = 0;
+    population.push_back(current);
   }
 
   return population;
 }
 
-std::vector<std::vector<std::vector<float>>> GA::createIndividual() {
-  std::vector<std::vector<std::vector<float>>> individual;
+Individual GA::createIndividual() {
+  Individual individual;
   std::vector<std::vector<float>> layerOne, layerTwo;
   layerOne.clear();
   layerTwo.clear();
@@ -70,30 +160,50 @@ std::vector<float> GA::createRow(int parameters[3]) {
   return vec;
 }
 
-std::vector<std::vector<std::vector<float>>>
-GA::child(std::vector<std::vector<std::vector<float>>> parentA,
-      std::vector<std::vector<std::vector<float>>> &parentB) {
+Individual GA::child(Individual parentA, Individual &parentB) {
 
-  std::cout << "1" << std::endl;
-  std::cout << "2" << std::endl;
+  std::random_device rnd_device;
+  std::default_random_engine generator(rnd_device());
+  std::uniform_real_distribution<float> distribution(0.0, 1.0);
+
   for (int i = 0; i < parentA.size(); i++) {
-    std::cout << "first loop" << std::endl;
     for (int j = 0; j < parentA[i].size(); j++) {
-      std::cout << "second loop" << std::endl;
       for (int k = 0; k < parentA[i][0].size(); k++) {
-        std::cout << "third loop" << std::endl;
-        double gen = (rand() % 101);
-        std::cout << "gen " << gen << std::endl;
-        if (gen < 50) {
-          std::cout << "tails" << std::endl;
+        float gen = distribution(generator);
+        if (gen < 0.5) {
           parentA[i][j][k] = parentB[i][j][k];
-          std::cout << "/* message */" << std::endl;
         }
       }
     }
   }
 
   return parentA;
+}
+
+void GA::mutate(Individual &individual, float severity) {
+  std::random_device rnd_device;
+  std::default_random_engine generator(rnd_device());
+
+  for (int i = 0; i < individual.size(); i++) {
+    std::uniform_real_distribution<float> elements(
+        0.0, individual[i].size() * individual[i][0].size() - 1);
+    std::uniform_real_distribution<float> rows(0.0, individual[i].size() - 1);
+    std::uniform_real_distribution<float> chromosomeLength(
+        0.0, individual[i][0].size() - 1);
+
+    int numberElements = severity * elements(generator);
+    std::cout << "numberElements " << numberElements << std::endl;
+
+    for (int j = 0; j < numberElements; j++) {
+      int rowNumber = rows(generator);
+      int index = chromosomeLength(generator);
+
+      std::normal_distribution<float> mutatedValue(-1, 1);
+      float newWeight =
+          individual[i][rowNumber][index] * mutatedValue(generator);
+      individual[i][rowNumber][index] = newWeight;
+    }
+  }
 }
 
 float GA::fitnessEval(int currentPosition, float sumPoints,
@@ -110,6 +220,56 @@ float GA::fitnessEval(int currentPosition, float sumPoints,
   }
 
   return sumPoints;
+}
+
+Population GA::createNewGen(Population &population, int tournamentSize,
+                            float elitism) {
+  sortByFitness(population);
+
+  std::random_device rnd_device;
+  std::default_random_engine generator(rnd_device());
+  Population random_parents, new_population;
+  std::vector<int> parentIndex;
+  parentIndex.clear();
+
+  int chosenIndex = 0;
+  int chosenOnes = elitism * population.size();
+
+  for (int i = 0; i < population.size() - chosenOnes; i++) {
+    for (int j = 0; j < tournamentSize; j++) {
+      std::uniform_real_distribution<float> parents(0.0, population.size());
+      chosenIndex = parents(generator);
+      if (!parentIndex.empty()) {
+        while (std::find(parentIndex.begin(), parentIndex.end(), chosenIndex) !=
+               parentIndex.end()) {
+          chosenIndex = parents(generator);
+        }
+      }
+      parentIndex.push_back(chosenIndex);
+      random_parents.push_back(population[chosenIndex]);
+    }
+
+    sortByFitness(random_parents);
+    Genotype offspring = {
+        child(random_parents[0].individual, random_parents[1].individual), 0.0};
+    new_population.push_back(offspring);
+    for (int i = 0; i < random_parents.size(); i++) {
+      random_parents[i].fitness = 0;
+    }
+    random_parents.clear();
+    parentIndex.clear();
+  }
+
+  for (int i = 0; i < chosenOnes; i++) {
+    new_population.push_back(population[i]);
+  }
+
+  return new_population;
+}
+
+void GA::sortByFitness(Population &population) {
+  std::sort(population.begin(), population.end(),
+            [](const auto &i, const auto &j) { return i.fitness > j.fitness; });
 }
 
 void GA::updatePosition(int positions[15], int currentPosition) {
@@ -159,3 +319,5 @@ int GA::position(std::vector<float> coordinates) {
 
   return current;
 }
+
+int roundNum(float x) { return floor(x * 100 + 0.5) / 100; }
