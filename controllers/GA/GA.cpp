@@ -28,36 +28,19 @@ void GA::printPopToFile(Population population) {
   std::string filename = time_now + "-allWeights.csv";
   std::ofstream data(filename, std::ios::out);
 
-  // get a test document
   pugi::xml_document doc;
 
-  // tag::code[]
-  // save document to file
-  // end::code[]
-  // <name>weights0</name>
-  // <weights>[]</weights>
-  // <name>weight1</name>
-  // <weights>[]</weights>
-  // <name>weight2</name>
-  // <layer1>[[1,2,3,4]
-  //          [1,3,4,5]
-  //          [4,3,7,4]
-  //          [8,4,3,5]]
-  // </layer1>
-  // <layer2>[
-  //           [4,3,7,4],
-  //           [8,4,3,5]]
-  // </layer2>
   std::string str;
 
   str.append("<nodes>");
   for (int i = 0; i < population.size(); i++) {
     std::cout << i << std::endl;
     // data << "Weights" << i << "=\"";
-    std::string weight = "<weights name=\"Weight " + std::to_string(i);
-    str.append(weight);
-    str.append("\"> \n");
-    str.append("<node>");
+    // std::string weight = "<weights name=\"Weight " + std::to_string(i);
+    // str.append(weight);
+    // str.append("\"> \n");
+    std::string node1 = "<node" + std::to_string(i) + "> ";
+    str.append(node1);
     for (int j = 0; j < population[i].individual.size(); j++) {
       std::string layer = "<layer" + std::to_string(j) + " val=\"";
       str.append(layer);
@@ -69,7 +52,7 @@ void GA::printPopToFile(Population population) {
               std::to_string(population[i].individual[j][l][k]) + ",";
           str.append(r);
         }
-          str.append("]/");
+        str.append("]/");
       }
       std::string layerEnd = "]\" ";
       std::string layer1 = "/>";
@@ -78,32 +61,120 @@ void GA::printPopToFile(Population population) {
     }
     // std::string end= "/>";
     // str.append(end);
-    std::string end1 = "</node>\n";
-    std::string end2 = "</weights>\n";
+    std::string end1 = "</node" + std::to_string(i) + ">\n";
     str.append(end1);
-    str.append(end2);
   }
   str.append("</nodes>");
+  // std::string end2 = "</weights>\n";
+  // str.append(end2);
   doc.load_string(str.c_str());
   std::cout << "Saving result: " << doc.save_file("save_file_output.xml")
             << std::endl;
 }
 
-void GA::parseFile(std::string filename, int popsize){
+Individual GA::returnFileWeights(std::vector<std::string> fileWeights) {
+  Individual weights;
+  std::vector<float> row;
+  std::vector<std::vector<float>> layer;
+  float temp = 0;
+  const std::string s = ",";
+  const std::string t = " ";
+
+  std::string::size_type n = 0;
+  for (int i = 0; i < fileWeights.size(); i++) {
+    fileWeights[i].erase(
+        std::remove(fileWeights[i].begin(), fileWeights[i].end(), '['),
+        fileWeights[i].end());
+    fileWeights[i].erase(
+        std::remove(fileWeights[i].begin(), fileWeights[i].end(), ']'),
+        fileWeights[i].end());
+    // fileWeights[i].erase(
+    //     std::remove(fileWeights[i].begin(), fileWeights[i].end(), '/'),
+    //     fileWeights[i].end());
+    // fileWeights[i].erase(
+    //     std::remove(fileWeights[i].begin(), fileWeights[i].end(), ','),
+    //     fileWeights[i].end());
+
+    // while ((n = fileWeights[i].find(s, n)) != std::string::npos) {
+    //   fileWeights[i].replace(n, s.size(), t);
+    //   n += t.size();
+    // }
+    std::stringstream test(fileWeights[i]);
+    std::string r;
+    std::vector<std::string> rows;
+
+    while(std::getline(test, r, '/'))
+    {
+       rows.push_back(r);
+    }
+    for (int m = 0; m < rows.size(); m++) {
+
+      std::stringstream test(rows[m]);
+      std::string element;
+      while(std::getline(test, element, ','))
+      {
+
+        row.push_back(atof(element.c_str()));
+      }
+
+      layer.push_back(row);
+
+      row.clear();
+    }
+
+    weights.push_back(layer);
+    layer.clear();
+
+
+
+
+    //
+    // for (int k = 0; k < row.size(); k++) {
+    //   std::stringstream ss(fileWeights[k]);
+    //   for (int j = 0; j < fileWeights; j++) {
+    //     ss >> temp;
+    //     row.push_back(temp);
+    //   }
+    //   layer.push_back(row);
+    //   row.clear();
+    // }
+    // weights.push_back(layer);
+    // // std::cout << "/* message */" << std::endl;
+    // layer.clear();
+  }
+  return weights;
+}
+
+std::vector<std::string> GA::parseFile(std::string filename, int popsize) {
+  std::vector<std::string> layerWeights;
   pugi::xml_document doc;
 
   pugi::xml_parse_result result = doc.load_file(filename.c_str());
 
-  for(int i = 0; i<popsize; i++)
-  {
-    std::cout << "Load result: " << result.description() << doc.child("nodes").child("weights").attribute("name").value() << std::endl;
-    std::cout << "Load result: " << result.description() << doc.child("nodes").child("weights").child("node").child("layer0").attribute("val").value() << std::endl;
-    std::cout << "Load result: " << result.description() << doc.child("nodes").child("weights").child("node").child("layer1").attribute("val").value() << std::endl;
+  for (int i = 0; i < popsize; i++) {
+    std::string nodeNum = "node" + std::to_string(i);
+    std::cout << "Weight " << i << std::endl;
+    std::string layerone = doc.child("nodes")
+                               .child(nodeNum.c_str())
+                               .child("layer0")
+                               .attribute("val")
+                               .value();
+    std::string layertwo = doc.child("nodes")
+                               .child(nodeNum.c_str())
+                               .child("layer1")
+                               .attribute("val")
+                               .value();
+    layerWeights.push_back(layerone);
+    layerWeights.push_back(layertwo);
+    // std::cout << "Load result: " << result.description() <<
+    // doc.child("nodes").child(nodeNum.c_str()).child("layer0").attribute("val").value()
+    // << std::endl;
+    // std::cout << "Load result: " << result.description() <<
+    // doc.child("nodes").child(nodeNum.c_str()).child("layer1").attribute("val").value()
+    // << std::endl;
   }
 
-// end::code[]
-
-
+  return layerWeights;
 }
 
 Population GA::populate(int popsize) {
