@@ -1,7 +1,6 @@
 // #include <webots/DistanceSensor.hpp>
 // #include <webots/GPS.hpp>
 
-#include "configLoader.hpp"
 #include "pugixml.hpp"
 #include <algorithm>
 #include <ctime>
@@ -15,6 +14,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <chrono>
+#include <thread>
+#include <sstream>
+
 
 #define TIME_STEP 32
 #define PS_THRESHOLD 150
@@ -33,10 +36,17 @@ private:
   int previousPosition;
   int allPositions[15];
   std::map<int, int> punishment;
+  std::vector<float> createRow(int parameters[3]);
+  void mutate(Individual &individual, float severity);
 
 public:
   // std::vector<float> getDistanceValues();
   // std::vector<float> getGPSValues();
+  Population populate(int popsize);
+  Individual createIndividual();
+
+  void mutateGen(Population &population, float mutateRate, float severity);
+
   void updatePosition(int positions[15], int currentPosition);
   int position(std::vector<float> coordinates);
   float fitnessEval(int currentPosition, float sumPoints,
@@ -44,13 +54,11 @@ public:
   Population createNewGen(Population &population, int tournamentSize,
                           float elitism);
   void sortByFitness(Population &population);
-  Population populate(int popsize);
-  void mutate(Individual &individual, float severity);
-  Individual createIndividual();
   Individual child(Individual parentA, Individual &parentB);
-  std::vector<float> createRow(int parameters[3]);
   void printIndividual(Individual individual);
   void printPopToFile(Population population);
   std::vector<std::string> parseFile(std::string filename, int popsize);
   Individual returnFileWeights(std::vector<std::string> fileWeights);
+  Individual returnBestWeights(Individual individual);
+
 };

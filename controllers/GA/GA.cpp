@@ -25,8 +25,8 @@ void GA::printPopToFile(Population population) {
   std::string time_now =
       std::to_string(ltm->tm_mday) + "-" + std::to_string(ltm->tm_hour) + ":" +
       std::to_string(ltm->tm_min) + ":" + std::to_string(ltm->tm_sec);
-  std::string filename = time_now + "-allWeights.csv";
-  std::ofstream data(filename, std::ios::out);
+
+std::string filename = time_now + "weights.xml";
 
   pugi::xml_document doc;
 
@@ -35,10 +35,6 @@ void GA::printPopToFile(Population population) {
   str.append("<nodes>");
   for (int i = 0; i < population.size(); i++) {
     std::cout << i << std::endl;
-    // data << "Weights" << i << "=\"";
-    // std::string weight = "<weights name=\"Weight " + std::to_string(i);
-    // str.append(weight);
-    // str.append("\"> \n");
     std::string node1 = "<node" + std::to_string(i) + "> ";
     str.append(node1);
     for (int j = 0; j < population[i].individual.size(); j++) {
@@ -47,7 +43,6 @@ void GA::printPopToFile(Population population) {
       for (int k = 0; k < population[i].individual[j][0].size(); k++) {
         str.append("[");
         for (int l = 0; l < population[i].individual[j].size(); l++) {
-          // data << population[i].individual[j][l][k] << ",";
           std::string r =
               std::to_string(population[i].individual[j][l][k]) + ",";
           str.append(r);
@@ -59,17 +54,23 @@ void GA::printPopToFile(Population population) {
       str.append(layerEnd);
       str.append(layer1);
     }
-    // std::string end= "/>";
-    // str.append(end);
     std::string end1 = "</node" + std::to_string(i) + ">\n";
     str.append(end1);
   }
   str.append("</nodes>");
-  // std::string end2 = "</weights>\n";
-  // str.append(end2);
   doc.load_string(str.c_str());
-  std::cout << "Saving result: " << doc.save_file("save_file_output.xml")
+  std::cout << "Saving result: " << doc.save_file(filename.c_str())
             << std::endl;
+}
+
+Individual GA::returnBestWeights(Individual individual) {
+  Individual bestWeights;
+
+  for (int i = 0; i < 2; i++) {
+    bestWeights.push_back(individual[i]);
+  }
+
+  return bestWeights;
 }
 
 Individual GA::returnFileWeights(std::vector<std::string> fileWeights) {
@@ -88,17 +89,6 @@ Individual GA::returnFileWeights(std::vector<std::string> fileWeights) {
     fileWeights[i].erase(
         std::remove(fileWeights[i].begin(), fileWeights[i].end(), ']'),
         fileWeights[i].end());
-    // fileWeights[i].erase(
-    //     std::remove(fileWeights[i].begin(), fileWeights[i].end(), '/'),
-    //     fileWeights[i].end());
-    // fileWeights[i].erase(
-    //     std::remove(fileWeights[i].begin(), fileWeights[i].end(), ','),
-    //     fileWeights[i].end());
-
-    // while ((n = fileWeights[i].find(s, n)) != std::string::npos) {
-    //   fileWeights[i].replace(n, s.size(), t);
-    //   n += t.size();
-    // }
     std::stringstream test(fileWeights[i]);
     std::string r;
     std::vector<std::string> rows;
@@ -124,23 +114,6 @@ Individual GA::returnFileWeights(std::vector<std::string> fileWeights) {
 
     weights.push_back(layer);
     layer.clear();
-
-
-
-
-    //
-    // for (int k = 0; k < row.size(); k++) {
-    //   std::stringstream ss(fileWeights[k]);
-    //   for (int j = 0; j < fileWeights; j++) {
-    //     ss >> temp;
-    //     row.push_back(temp);
-    //   }
-    //   layer.push_back(row);
-    //   row.clear();
-    // }
-    // weights.push_back(layer);
-    // // std::cout << "/* message */" << std::endl;
-    // layer.clear();
   }
   return weights;
 }
@@ -249,6 +222,18 @@ Individual GA::child(Individual parentA, Individual &parentB) {
   }
 
   return parentA;
+}
+
+void GA::mutateGen(Population &population, float mutateRate, float severity) {
+  std::random_device rnd_device;
+  std::default_random_engine generator(rnd_device());
+
+  for (int i = 0; i < population.size(); i++) {
+    std::uniform_real_distribution<float> chance(0.0, 1.0);
+    if (chance(generator) < mutateRate) {
+      mutate(population[i].individual, severity);
+    }
+  }
 }
 
 void GA::mutate(Individual &individual, float severity) {

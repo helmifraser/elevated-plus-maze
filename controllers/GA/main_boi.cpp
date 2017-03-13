@@ -12,13 +12,12 @@ void printIndividual(Individual individual) {
   }
 
   std::cout << std::endl;
-  std::cout << "-----------------------------------------------------------" << std::endl;
+  std::cout << "-----------------------------------------------------------"
+            << std::endl;
 }
 
-void printAll(Individual individual)
-{
-  for(int z = 0; z < individual.size(); z++)
-  {
+void printAll(Individual individual) {
+  for (int z = 0; z < individual.size(); z++) {
     for (int x = 0; x < individual[z].size(); x++) {
       /* code */
       for (int c = 0; c < individual[z][x].size(); c++) {
@@ -34,22 +33,29 @@ void printAll(Individual individual)
 int main(int argc, char const *argv[]) {
 
   GA *test = new GA;
-  configLoader *fileLoader = new configLoader();
 
   srand(time(NULL));
   int popsize = 10;
+  float muteRate = 1;
   std::vector<Genotype> population;
   population = test->populate(popsize);
 
   test->printPopToFile(population);
-  std::vector<std::string> fileOut = test->parseFile("save_file_output.xml", popsize);
-  Individual testOut = test->returnFileWeights(fileOut);
-  printAll(testOut);
+
+  test->mutateGen(population, muteRate, 1);
+
+  // std::vector<std::string> fileOut = test->parseFile("weights.xml", popsize);
+  // Individual testOut = test->returnFileWeights(fileOut);
+  // printAll(testOut);
+  // std::cout << "testOut " << testOut.size() << std::endl;
+  // printAll(test->returnBestWeights(testOut));
+
   // printIndividual(population[0].individual);
   //
   // std::string filename;
   // std::cin >> filename;
-  // std::map<std::string, std::string> helloooo = fileLoader->LoadConfig(filename);
+  // std::map<std::string, std::string> helloooo =
+  // fileLoader->LoadConfig(filename);
   //
   // std::cout << helloooo["Weights0"];
   // std::cout << "Done" << std::endl;

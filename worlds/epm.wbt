@@ -10,15 +10,21 @@ Background {
     0.4 0.7 1
   ]
 }
-E-puck {
-  hidden translation_1 -0.026000717 0.020010627 -7.706938e-10
-  hidden rotation_1 1 8.8616894e-08 4.5068622e-06 -0.0030083208
-  hidden translation_2 0.026000719 0.02001057 5.3003879e-11
-  hidden rotation_2 0.23615149 0.00061116715 0.97171606 1.5421581e-08
-  translation 0.019660723 0.49492661 -0.12169931
-  rotation 0.0078144272 0.99996946 -8.3948734e-05 0.054179762
-  controller "objectAvoidance"
-  name "rat boi"
+DEF E-puck E-puck {
+  hidden linearVelocity_0 -1.33147e-08 -7.32827e-06 -4.76782e-08
+  hidden angularVelocity_0 -3.18169e-06 5.03616e-11 8.87859e-07
+  hidden translation_1 -0.026000717 0.0200144 -9.8186495e-10
+  hidden rotation_1 1 8.8016032e-08 4.423141e-06 -0.0030083208
+  hidden linearVelocity_1 -1.77668e-08 2.94227e-08 -6.36321e-08
+  hidden angularVelocity_1 -3.18167e-06 5.03927e-11 8.88351e-07
+  hidden translation_2 0.026000719 0.020014324 8.7520685e-12
+  hidden rotation_2 0.23232228 0.00074135297 0.97263858 1.5666202e-08
+  hidden linearVelocity_2 -1.77669e-08 2.8702e-08 -6.36333e-08
+  hidden angularVelocity_2 -3.18167e-06 5.03926e-11 8.88351e-07
+  translation 0.019660723 0.49492285 -0.12169931
+  rotation 3.5309292e-05 0.99999999 0.00013370814 0.054178114
+  controller "neural_network"
+  name "ratboi"
   groundSensorsSlot [
     E-puckGroundSensors {
     }
@@ -28,13 +34,14 @@ PointLight {
   ambientIntensity 1
   location 0 10 0
 }
-Floor {
-  texture [
-    "textures/checkered_parquetry.jpg"
-    ""
-    ""
-    ""
+Supervisor {
+  translation 0 2 0
+  children [
+    Receiver {
+      byteSize 32
+    }
   ]
+  controller "super"
 }
 Group {
   children [
@@ -337,4 +344,7 @@ Group {
       }
     }
   ]
+}
+RectangleArena {
+  floorSize 3 3
 }

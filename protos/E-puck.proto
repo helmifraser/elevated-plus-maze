@@ -1020,8 +1020,8 @@ DifferentialWheels {
       name "em7"
     }
     DEF EPUCK_EMITTER Emitter {
-      type         "infra-red"  # or "serial" or "infra-red
-      range        0.35       # -1 or positive
+      type         "radio"  # or "serial" or "infra-red
+      range       -1       # -1 or positive
       maxRange     -1     # -1 or positive
       aperture     -1      # -1 or between 0 and 2*pi
       channel      0
@@ -1030,7 +1030,7 @@ DifferentialWheels {
       bufferSize   -1       # -1 or positive
       translation 0.00 0.33 0.00
       rotation 0 0 0 0
-      name "em8"
+      name "radio"
     }
     DEF EPUCK_PS0 E-puckDistanceSensor {
       translation 0.01 0.033 -0.03

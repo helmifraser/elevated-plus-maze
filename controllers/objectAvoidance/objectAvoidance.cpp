@@ -57,32 +57,35 @@ public:
   }
 
   void run() {
+    // while (step(TIME_STEP) != -1) {
+    //   std::cout << "Press 1 to object detection, 2 for teleop, 3 for test " << std::endl;
+    //   int decide = readKey();
+    //   switch (decide) {
+    //   case 49:
+    //     std::cout << "Start" << std::endl;
+    //     objectDetectionMode();
+    //     break;
+    //   case 50:
+    //     std::cout << "Teleop" << '\n';
+    //     teleop();
+    //     break;
+    //
+    //   case 51:
+    //     std::cout << "Test distanceSensors" << std::endl;
+    //     // std::vector<float> test = getDistanceValues();
+    //     std::vector<float> test = getGroundSensorValues();
+    //     // float reading = groundSensor[0]->getValue();
+    //     std::cout << "Ground: " << test[0] << " " << test[1] << " " << test[2] << std::endl;
+    //     // for (int i = 0; i < test.size(); i++) {
+    //     //   std::cout << test[i] << " ";
+    //     // }
+    //     // std::cout << std::endl;
+    //     // distanceCheck();
+    //     break;
+    //   }
+    // }
     while (step(TIME_STEP) != -1) {
-      std::cout << "Press 1 to object detection, 2 for teleop, 3 for test " << std::endl;
-      int decide = readKey();
-      switch (decide) {
-      case 49:
-        std::cout << "Start" << std::endl;
-        objectDetectionMode();
-        break;
-      case 50:
-        std::cout << "Teleop" << '\n';
-        teleop();
-        break;
-
-      case 51:
-        std::cout << "Test distanceSensors" << std::endl;
-        // std::vector<float> test = getDistanceValues();
-        std::vector<float> test = getGroundSensorValues();
-        // float reading = groundSensor[0]->getValue();
-        std::cout << "Ground: " << test[0] << " " << test[1] << " " << test[2] << std::endl;
-        // for (int i = 0; i < test.size(); i++) {
-        //   std::cout << test[i] << " ";
-        // }
-        // std::cout << std::endl;
-        // distanceCheck();
-        break;
-      }
+      objectDetectionMode();
     }
   }
 
@@ -159,9 +162,12 @@ public:
 
   void objectDetectionMode() {
     setLEDs(1);
-    while (step(TIME_STEP != -1)) {
+    int count = 0;
+    while (step(TIME_STEP != -1) & count < 100) {
       objectDetection(1.0);
+      count++;
     }
+    move(0,0);
   }
 
   void distanceCheck() {
@@ -182,11 +188,11 @@ public:
         (ps_values[0] > PS_THRESHOLD) & (ps_values[7] > PS_THRESHOLD);
     back_obstacle =
         (ps_values[3] > PS_THRESHOLD) & (ps_values[4] > PS_THRESHOLD);
-    std::cout << "ps_values ";
-    for (size_t i = 0; i < 8; i++) {
-      std::cout << ps_values[i] << " ";
-    }
-    std::cout << std::endl;
+    // std::cout << "ps_values ";
+    // for (size_t i = 0; i < 8; i++) {
+    //   std::cout << ps_values[i] << " ";
+    // }
+    // std::cout << std::endl;
   }
 
   void objectDetection(double speedAdjust) {
@@ -221,8 +227,8 @@ public:
     if (right_speed > 1000) {
       right_speed = 1000;
     }
-    std::cout << "left_speed " << left_speed << " right_speed " << right_speed
-              << '\n';
+    // std::cout << "left_speed " << left_speed << " right_speed " << right_speed
+    //           << '\n';
     move((int)left_speed, (int)right_speed);
   }
 
