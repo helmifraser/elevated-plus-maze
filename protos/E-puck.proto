@@ -1026,7 +1026,7 @@ DifferentialWheels {
       aperture     -1      # -1 or between 0 and 2*pi
       channel      0
       baudRate     -1       # -1 or positive
-      byteSize      32       # 8 or more
+      byteSize      8      # 8 or more
       bufferSize   -1       # -1 or positive
       translation 0.00 0.33 0.00
       rotation 0 0 0 0

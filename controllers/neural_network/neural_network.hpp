@@ -12,6 +12,8 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <string.h>
+
 
 #define TIME_STEP 32
 
@@ -33,10 +35,11 @@ private:
                                std::vector<std::vector<float>> weights);
   void sendPacket(std::vector<float> sensorValues);
   std::vector<float> getDistanceSensorValues();
-  std::vector<float> getGPSValue();
+  std::vector<float> getGPSValues();
 
   public:
     neural_network();
+    void run();
     std::vector<float> getOutputs(std::vector<float> inputs,
                                   Individual weights);
   };
