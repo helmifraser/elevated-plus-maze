@@ -6,6 +6,9 @@ neural_network::neural_network() {
 
   radio = getEmitter("radio");
 
+  receiver = getReceiver("receiver");
+  receiver->enable(TIME_STEP);
+
   std::string ps = "ps";
   std::string led = "led";
 
@@ -26,6 +29,57 @@ void neural_network::sendPacket(std::vector<float> sensorValues) {
   const char *message = temp.c_str();
   radio->send(message, strlen(message) + 1);
 
+}
+
+void neural_network::getReceiverData() {
+  const size_t spartans = 400;
+  Receiver *copy = (Receiver *)malloc(spartans);
+  for (int i = 0; i < receiver->getQueueLength(); i++) {
+    data = (char *)receiver->getData();
+    memcpy(copy, data, spartans);
+    receivedWeights = (char *)copy;
+    receiver->nextPacket();
+  }
+}
+
+void neural_network::processReceiverData(std::string data) {
+  try {
+    std::regex re("[*0-9*.*0-9*]+|[-][*0-9*.*0-9*]+");
+      std::sregex_iterator next(data.begin(), data.end(), re);
+      std::sregex_iterator end;
+      std::vector<float> row;
+      std::vector<std::vector<float>> layer1;
+      std::vector<std::vector<float>> layer2;
+
+      int index, index1, index2 = 0;
+
+      while (next != end) {
+        std::smatch match = *next;
+        std::string match1 = match.str();
+
+        for (int i = 0; i<4; i++) {
+          for (int j = 0; j<8; j++) {
+            row.push_back(atof(match1.c_str()));
+          }
+          layer1.push_back(row);
+          row.clear();
+        }
+        for(int i = 0; i<2; i++) {
+            for(int j = 0; j<4; j++) {
+              row.push_back(atof(match1.c_str()));
+            }
+          layer2.push_back(row);
+          row.clear();
+        }
+          weights.push_back(layer1);
+          weights.push_back(layer2);
+        next++;
+        index++;
+    }
+
+  } catch (std::regex_error &e) {
+    std::cout << "Error in regex" << std::endl;
+  }
 }
 
 std::vector<float> neural_network::getDistanceSensorValues() {
@@ -90,18 +144,18 @@ std::vector<float> neural_network::getOutputs(
 }
 
 void neural_network::run() {
-  std::vector<float> vals;
-  std::vector<float> dist;
+  std::vector<float> vals, dist, wheelSpeeds;
 
   while (step(TIME_STEP) != -1) {
     dist = getDistanceSensorValues();
     vals = getGPSValues();
-
-
-
-
+    getReceiverData();
+    processReceiverData(receivedWeights);
+    wheelSpeeds = getOutputs(dist, weights);
+    // ALWAYS ALWAYS ALWAYS dist first before vals
     sendPacket(dist);
     sendPacket(vals);
+    setSpeed(wheelSpeeds[0], wheelSpeeds[1]);
   }
 }
 

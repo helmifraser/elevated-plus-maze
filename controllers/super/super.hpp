@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include <regex>
 
 using namespace std;
 using namespace webots;
@@ -20,6 +21,8 @@ public:
   void run();
   void live();
   void getReceiverData(int arrayIndex);
+  void processReceiverData(std::string data, int i);
+
 
 private:
   std::string name;
@@ -36,6 +39,9 @@ private:
   // const std::vector<float> *data;
   const char *data;
   std::array<std::string, 2> myString;
+
+  std::vector<float> sensorData;
+  std::vector<float> gpsData;
 
 
 };

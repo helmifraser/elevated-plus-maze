@@ -11,12 +11,12 @@ Background {
   ]
 }
 DEF E-puck E-puck {
-  hidden translation_1 -0.026000717 0.020015579 -9.8226809e-10
-  hidden rotation_1 1 8.8051984e-08 4.3969871e-06 -0.0030083208
-  hidden translation_2 0.026000719 0.020015497 9.1280178e-12
-  hidden rotation_2 0.23119085 0.00073839292 0.97290814 1.5742825e-08
-  translation 0.019660723 0.49492167 -0.12169931
-  rotation 2.4436886e-06 0.99999999 0.00013664277 0.054178114
+  hidden translation_1 -0.026000717 0.020016758 -9.8230196e-10
+  hidden rotation_1 1 8.8091528e-08 4.3708375e-06 -0.0030083208
+  hidden translation_2 0.026000719 0.02001667 9.0447233e-12
+  hidden rotation_2 0.23007094 0.00073477447 0.97317358 1.5819458e-08
+  translation 0.019660723 0.4949205 -0.12169931
+  rotation 4.8263635e-06 0.99999999 0.00013869195 0.054178114
   controller "neural_network"
   name "ratboi"
   groundSensorsSlot [
@@ -31,6 +31,9 @@ PointLight {
 Supervisor {
   translation 0 2 0
   children [
+    Emitter {
+      channel 1
+    }
     Receiver {
     }
   ]

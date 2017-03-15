@@ -31,6 +31,7 @@ simulationControl::simulationControl() {
 void simulationControl::run() {
   // std::vector<float> data;
   // data.clear();
+  std::string hello = "0.999 0.899 9 81";
 
   while (step(timeStep) != -1) {
     int keyboardInput = keyboard->getKey();
@@ -42,6 +43,19 @@ void simulationControl::run() {
       getReceiverData(1);
       std::cout << "data " << myString[0] << std::endl;
       std::cout << "gps " << myString[1] << std::endl;
+      processReceiverData(myString[0], 0);
+      processReceiverData(myString[1], 1);
+      std::cout << "receiver data ";
+      for (size_t i = 0; i < sensorData.size(); i++) {
+        std::cout << sensorData[i] << " ";
+      }
+      std::cout << std::endl;
+
+      std::cout << "gps data ";
+      for (size_t i = 0; i < gpsData.size(); i++) {
+        std::cout << gpsData[i] << " ";
+      }
+      std::cout << std::endl;
 
       break;
     case 50:
@@ -69,15 +83,43 @@ void simulationControl::live() {
   }
 }
 
-void simulationControl::getReceiverData(int arrayIndex) {
-    const size_t spartans = 400;
-    Receiver *copy = (Receiver *)malloc(spartans);
-    for (int i = 0; i < receiver->getQueueLength(); i++) {
-      data = (char *)receiver->getData();
-      memcpy(copy, data, spartans);
-      myString[arrayIndex] = (char *)copy;
-      receiver->nextPacket();
+void simulationControl::processReceiverData(std::string data, int i) {
+  try {
+    std::regex re("[*0-9*.*0-9*]+|[-][*0-9*.*0-9*]+");
+      std::sregex_iterator next(data.begin(), data.end(), re);
+      std::sregex_iterator end;
+      int index = 0;
+      if (i == 0) {
+        sensorData.clear();
+      } else {
+        gpsData.clear();
+      }
+      while (next != end) {
+        std::smatch match = *next;
+        std::string match1 = match.str();
+        if (i == 0) {
+          sensorData.push_back(atof(match1.c_str()));
+        } else if (i == 1) {
+          gpsData.push_back(atof(match1.c_str()));
+        }
+        next++;
+        index++;
     }
+
+  } catch (std::regex_error &e) {
+    std::cout << "Error in regex" << std::endl;
+  }
+}
+
+void simulationControl::getReceiverData(int arrayIndex) {
+  const size_t spartans = 400;
+  Receiver *copy = (Receiver *)malloc(spartans);
+  for (int i = 0; i < receiver->getQueueLength(); i++) {
+    data = (char *)receiver->getData();
+    memcpy(copy, data, spartans);
+    myString[arrayIndex] = (char *)copy;
+    receiver->nextPacket();
+  }
 }
 
 int main() {
