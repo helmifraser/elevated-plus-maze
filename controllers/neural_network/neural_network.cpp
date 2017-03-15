@@ -9,6 +9,9 @@ neural_network::neural_network() {
   receiver = getReceiver("receiver");
   receiver->enable(TIME_STEP);
 
+  keyboard = getKeyboard();
+  keyboard->enable(TIME_STEP);
+
   std::string ps = "ps";
   std::string led = "led";
 
@@ -21,12 +24,12 @@ neural_network::neural_network() {
   myGA = new GA();
   popsize = 50;
   generations = 20;
-  tournamentSize = 3;
-  elitism = 0.01;
-  muteRate = 0.5;
-  severity = 1;
+  tournamentSize = 5;
+  elitism = 0.2;
+  muteRate = 0.02;
+  severity = 0.4;
 
-  timeCount = 4688;
+  timeCount = 938;
   count = 0;
 }
 
@@ -170,9 +173,9 @@ float neural_network::scaleVal(float parameters[4], float value) {
 }
 
 void neural_network::printAll(Individual individual) {
-  for (int z = 0; z < individual.size(); z++) {
-    for (int x = 0; x < individual[z].size(); x++) {
-      for (int c = 0; c < individual[z][x].size(); c++) {
+  for (size_t z = 0; z < individual.size(); z++) {
+    for (size_t x = 0; x < individual[z].size(); x++) {
+      for (size_t c = 0; c < individual[z][x].size(); c++) {
         std::cout << " " << individual[z][x][c] << " ";
       }
       std::cout << std::endl;
@@ -223,7 +226,8 @@ void neural_network::run() {
       count++;
     }
     population[j].fitness = sumPoints;
-     std::cout << "sumPoints" << j << " " << sumPoints << std::endl;
+    std::cout << "sumPoints"
+              << " " << 0 << " " << sumPoints << std::endl;
     boolean = false;
   }
   for (int i = 0; i < generations - 1; i++) {
@@ -245,7 +249,8 @@ void neural_network::run() {
 
         currentPosition = myGA->position(vals);
         myGA->updatePosition(positionMap, currentPosition);
-        sumPoints = myGA->fitnessEval(currentPosition, positionMap, sumPoints, v);
+        sumPoints =
+            myGA->fitnessEval(currentPosition, positionMap, sumPoints, v);
         v.clear();
         check = count % timeCount;
         if (check == 0 && count > 0) {
@@ -254,19 +259,58 @@ void neural_network::run() {
         count++;
       }
       newPop[j].fitness = sumPoints;
-      std::cout << "sumPoints" << i + 1 << " " << sumPoints << std::endl;
+      std::cout << "sumPoints " << i + 1 << " " << sumPoints << std::endl;
       boolean = false;
     }
   }
 
+  myGA->sortByFitness(newPop);
+
   std::cout << "Done" << std::endl;
   myGA->printPopToFile(newPop);
+}
+
+void neural_network::keyboardSelect() {
+  std::cout << "Select. 1 for demo, 2 for evolution" << std::endl;
+  while (step(TIME_STEP) != -1) {
+    int keyboardInput = keyboard->getKey();
+    switch (keyboardInput) {
+      case 49:
+      std::cout << "Demo" << std::endl;
+      demo();
+      break;
+      case 50:
+      std::cout << "Evolve" << std::endl;
+      run();
+      break;
+    }
+  }
+}
+
+void neural_network::demo() {
+  std::cout << "Parsing file" << std::endl;
+  std::string filename = "weights.xml";
+
+  Individual bestWeight = myGA->returnBestWeights(myGA->returnFileWeights(myGA->parseFile(filename, popsize)));
+  std::vector<float> v, wheelSpeeds, dist;
+  float scaleParam[4] = {50, 1000, -2.5, 2.5};
+
+  while (step(TIME_STEP) != -1) {
+
+    dist = getDistanceSensorValues();
+    for (size_t i = 0; i < 8; i++) {
+      v.push_back(scaleVal(scaleParam, dist[i]));
+    }
+    wheelSpeeds = getOutputs(v, bestWeight);
+    setSpeed(wheelSpeeds[0], wheelSpeeds[1]);
+    v.clear();
+  }
 
 }
 
 int main(int argc, char const *argv[]) {
   neural_network *net = new neural_network();
-  net->run();
+  net->keyboardSelect();
   delete net;
   return 0;
 }

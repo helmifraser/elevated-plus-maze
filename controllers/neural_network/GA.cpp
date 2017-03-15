@@ -2,17 +2,17 @@
 #include <algorithm>
 
 std::map<int, int> GA::points() {
-  std::map<int, int> pointsMap = {{0, -10}, {1, 2},   {2, 4},   {3, 3},
-                                  {4, 4},   {5, 6},   {6, -1},  {7, -2},
-                                  {8, -3},  {9, -4},  {10, -9}, {11, -1},
-                                  {12, -2}, {13, -3}, {14, -4}, {15, -9}};
+  std::map<int, int> pointsMap = {{0, -50}, {1, 5},   {2, 20},   {3, 40},
+                                  {4, 20},   {5, 5},   {6, -10},  {7, -15},
+                                  {8, -18},  {9, -20},  {10, -48}, {11, -10},
+                                  {12, -15}, {13, -18}, {14, -20}, {15, -48}};
   return pointsMap;
 }
 
 std::map<std::string, float> sensorPoints = {{"reward", 0.25},
-                                             {"punishment", -2}};
-std::map<std::string, float> exploreFam = {{"reward", 1},
-                                             {"punishment", -3}};
+                                             {"punishment", -10}};
+// std::map<std::string, float> exploreFam = {{"reward", 1},
+//                                              {"punishment", -3}};
 
 void GA::printAll(Individual individual) {
   for (int z = 0; z < individual.size(); z++) {
@@ -159,15 +159,15 @@ float GA::fitnessEval(int currentPosition, int position[15], float sumPoints, st
   difference = max - average;
 
   std::map<int, int> map = points();
-  if (difference > average / 2) {
-    sumPoints += map[currentPosition] + exploreFam["punishment"];
-  } else {
-    sumPoints += map[currentPosition] + exploreFam["reward"];
-  }
+  // if (difference > average / 2) {
+    sumPoints += map[currentPosition] /*+ exploreFam["punishment"]*/;
+  // } else {
+  //  sumPoints += map[currentPosition] + exploreFam["reward"];
+  //}
   for (int i = 0; i < 8; i++) {
-    if (sensorValues[i] >= 1.71) {
+    if (sensorValues[i] >= 1.71 || sensorValues[i] < 0.1) {
       sumPoints += sensorPoints["punishment"];
-    } else if (sensorValues[i] < 1.71) {
+    } else if (sensorValues[i] < 1.71 && sensorValues[i] >= 0.1) {
       sumPoints += sensorPoints["reward"];
     }
   }
@@ -282,13 +282,7 @@ int GA::position(std::vector<float> coordinates) {
 int roundNum(float x) { return floor(x * 100 + 0.5) / 100; }
 
 void GA::printPopToFile(Population population) {
-  time_t now = time(0);
-  tm *ltm = localtime(&now);
-  std::string time_now =
-      std::to_string(ltm->tm_mday) + "-" + std::to_string(ltm->tm_hour) + ":" +
-      std::to_string(ltm->tm_min) + ":" + std::to_string(ltm->tm_sec);
-
-  std::string filename = time_now + "weights.xml";
+  std::string filename = "weights.xml";
 
   pugi::xml_document doc;
 
@@ -346,12 +340,6 @@ std::vector<std::string> GA::parseFile(std::string filename, int popsize) {
                                .value();
     layerWeights.push_back(layerone);
     layerWeights.push_back(layertwo);
-    // std::cout << "Load result: " << result.description() <<
-    // doc.child("nodes").child(nodeNum.c_str()).child("layer0").attribute("val").value()
-    // << std::endl;
-    // std::cout << "Load result: " << result.description() <<
-    // doc.child("nodes").child(nodeNum.c_str()).child("layer1").attribute("val").value()
-    // << std::endl;
   }
 
   return layerWeights;

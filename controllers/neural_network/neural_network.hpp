@@ -6,6 +6,7 @@
 #include <webots/GPS.hpp>
 #include <webots/LED.hpp>
 #include <webots/Robot.hpp>
+#include <webots/Keyboard.hpp>
 
 // own
 #include <array>
@@ -37,6 +38,7 @@ private:
   LED *leds[8];
   Individual weights;
   GA *myGA;
+  Keyboard *keyboard;
 
   int popsize,timeCount, count, generations, tournamentSize;
 
@@ -58,9 +60,12 @@ private:
   void printAll(Individual individual);
 
 
+
   public:
     neural_network();
     void run();
+    void demo();
+    void keyboardSelect();
     std::vector<float> getOutputs(std::vector<float> inputs,
                                   Individual weights);
   };

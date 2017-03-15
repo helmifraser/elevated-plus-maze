@@ -7,5 +7,6 @@ build/release/neural_network.o: neural_network.cpp neural_network.hpp \
  /usr/local/webots/include/controller/cpp/webots/Emitter.hpp \
  /usr/local/webots/include/controller/cpp/webots/Receiver.hpp \
  /usr/local/webots/include/controller/cpp/webots/GPS.hpp \
- /usr/local/webots/include/controller/cpp/webots/LED.hpp GA.hpp \
+ /usr/local/webots/include/controller/cpp/webots/LED.hpp \
+ /usr/local/webots/include/controller/cpp/webots/Keyboard.hpp GA.hpp \
  pugixml.hpp pugiconfig.hpp

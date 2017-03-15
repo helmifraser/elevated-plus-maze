@@ -2,7 +2,7 @@
 
 simulationControl::simulationControl() {
   timeStep = 32;
-  timeCount = 4688; // 9375
+  timeCount = 938; // 9375
   name = "E-puck";
   robot = getFromDef(name.c_str());
 
