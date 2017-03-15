@@ -17,6 +17,17 @@ neural_network::neural_network() {
     distanceSensors[i]->enable(TIME_STEP);
     leds[i] = getLED(led.replace(3, 1, std::to_string(i)));
   }
+
+  myGA = new GA();
+  popsize = 50;
+  generations = 20;
+  tournamentSize = 3;
+  elitism = 0.01;
+  muteRate = 0.5;
+  severity = 1;
+
+  timeCount = 4688;
+  count = 0;
 }
 
 void neural_network::sendPacket(std::vector<float> sensorValues) {
@@ -28,7 +39,6 @@ void neural_network::sendPacket(std::vector<float> sensorValues) {
   }
   const char *message = temp.c_str();
   radio->send(message, strlen(message) + 1);
-
 }
 
 void neural_network::getReceiverData() {
@@ -43,38 +53,42 @@ void neural_network::getReceiverData() {
 }
 
 void neural_network::processReceiverData(std::string data) {
+  messageReceived = false;
   try {
     std::regex re("[*0-9*.*0-9*]+|[-][*0-9*.*0-9*]+");
-      std::sregex_iterator next(data.begin(), data.end(), re);
-      std::sregex_iterator end;
-      std::vector<float> row;
-      std::vector<std::vector<float>> layer1;
-      std::vector<std::vector<float>> layer2;
+    std::sregex_iterator next(data.begin(), data.end(), re);
+    std::sregex_iterator end;
+    std::vector<float> row;
+    std::vector<std::vector<float>> layer1;
+    std::vector<std::vector<float>> layer2;
 
-      int index, index1, index2 = 0;
+    int index = 0;
 
-      while (next != end) {
-        std::smatch match = *next;
-        std::string match1 = match.str();
+    while (next != end) {
+      std::smatch match = *next;
+      std::string match1 = match.str();
 
-        for (int i = 0; i<4; i++) {
-          for (int j = 0; j<8; j++) {
-            row.push_back(atof(match1.c_str()));
-          }
-          layer1.push_back(row);
-          row.clear();
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 8; j++) {
+          row.push_back(atof(match1.c_str()));
         }
-        for(int i = 0; i<2; i++) {
-            for(int j = 0; j<4; j++) {
-              row.push_back(atof(match1.c_str()));
-            }
-          layer2.push_back(row);
-          row.clear();
+        layer1.push_back(row);
+        row.clear();
+      }
+      for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 4; j++) {
+          row.push_back(atof(match1.c_str()));
         }
-          weights.push_back(layer1);
-          weights.push_back(layer2);
-        next++;
-        index++;
+        layer2.push_back(row);
+        row.clear();
+      }
+      weights.push_back(layer1);
+      weights.push_back(layer2);
+      next++;
+      index++;
+      if (next == end) {
+        messageReceived = true;
+      }
     }
 
   } catch (std::regex_error &e) {
@@ -114,49 +128,140 @@ std::vector<float>
 neural_network::layerCalc(std::vector<float> nodeOutputs,
                           std::vector<std::vector<float>> weightLayer) {
 
-  std::vector<std::vector<float>> current = weightLayer;
   std::vector<float> layerOutput;
   float sum = 0;
-  for (size_t i = 0; i < current.size(); i++) {
+
+  for (size_t i = 0; i < weightLayer.size(); i++) {
     sum = 0;
     for (size_t j = 0; j < nodeOutputs.size(); j++) {
-      sum += nodeOutputs[j] * current[i][j];
+      sum += nodeOutputs[j] * weightLayer[i][j];
     }
-    std::cout << sum << std::endl;
     layerOutput.push_back(sum);
   }
   return activationFunc(layerOutput);
 }
 
-std::vector<float> neural_network::getOutputs(
-    std::vector<float> inputs,
-    Individual weights) {
+std::vector<float> neural_network::getOutputs(std::vector<float> inputs,
+                                              Individual weights) {
+
   std::vector<float> firstLayer = activationFunc(inputs);
 
   std::vector<float> hiddenLayer = layerCalc(firstLayer, weights[0]);
 
   std::vector<float> outputLayer = layerCalc(hiddenLayer, weights[1]);
-
   std::transform(outputLayer.begin(), outputLayer.end(), outputLayer.begin(),
                  std::bind1st(std::multiplies<float>(), 1000));
 
   return outputLayer;
 }
 
+float neural_network::scaleVal(float parameters[4], float value) {
+  float out = (((parameters[3] - parameters[2]) * (value - parameters[0])) /
+               (parameters[1] - parameters[0])) +
+              parameters[2];
+
+  if (out > 2.5) {
+    out = 2.5;
+  } else if (out < -2.5) {
+    out = -2.5;
+  }
+
+  return out;
+}
+
+void neural_network::printAll(Individual individual) {
+  for (int z = 0; z < individual.size(); z++) {
+    for (int x = 0; x < individual[z].size(); x++) {
+      for (int c = 0; c < individual[z][x].size(); c++) {
+        std::cout << " " << individual[z][x][c] << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+  }
+}
+
 void neural_network::run() {
   std::vector<float> vals, dist, wheelSpeeds;
 
-  while (step(TIME_STEP) != -1) {
-    dist = getDistanceSensorValues();
-    vals = getGPSValues();
-    getReceiverData();
-    processReceiverData(receivedWeights);
-    wheelSpeeds = getOutputs(dist, weights);
-    // ALWAYS ALWAYS ALWAYS dist first before vals
-    sendPacket(dist);
-    sendPacket(vals);
-    setSpeed(wheelSpeeds[0], wheelSpeeds[1]);
+  int currentPosition = 0;
+  int positionMap[15];
+  bool boolean = false;
+
+  float sumPoints = 0;
+  float scaleParam[4] = {50, 1000, -2.5, 2.5};
+  std::vector<float> v;
+
+  Population population = myGA->populate(popsize);
+  Population newPop;
+
+  int check = count % timeCount;
+
+  for (int j = 0; j < popsize; j++) {
+    sumPoints = 0;
+    while (step(TIME_STEP) != -1 && boolean == false) {
+      dist = getDistanceSensorValues();
+      vals = getGPSValues();
+      for (size_t i = 0; i < 8; i++) {
+        v.push_back(scaleVal(scaleParam, dist[i]));
+      }
+
+      wheelSpeeds.clear();
+      wheelSpeeds = getOutputs(v, population[j].individual);
+      setSpeed(wheelSpeeds[0], wheelSpeeds[1]);
+
+      currentPosition = myGA->position(vals);
+      myGA->updatePosition(positionMap, currentPosition);
+
+      sumPoints = myGA->fitnessEval(currentPosition, positionMap, sumPoints, v);
+      v.clear();
+
+      check = count % timeCount;
+      if (check == 0 && count > 0) {
+        boolean = true;
+      }
+      count++;
+    }
+    population[j].fitness = sumPoints;
+     std::cout << "sumPoints" << j << " " << sumPoints << std::endl;
+    boolean = false;
   }
+  for (int i = 0; i < generations - 1; i++) {
+    newPop = myGA->createNewGen(population, tournamentSize, elitism);
+    myGA->mutateGen(newPop, muteRate, severity);
+    for (int j = 0; j < popsize; j++) {
+      sumPoints = 0;
+      while ((step(TIME_STEP) != -1) && boolean == false) {
+
+        dist = getDistanceSensorValues();
+        vals = getGPSValues();
+        for (size_t i = 0; i < 8; i++) {
+          v.push_back(scaleVal(scaleParam, dist[i]));
+        }
+
+        wheelSpeeds.clear();
+        wheelSpeeds = getOutputs(v, newPop[j].individual);
+        setSpeed(wheelSpeeds[0], wheelSpeeds[1]);
+
+        currentPosition = myGA->position(vals);
+        myGA->updatePosition(positionMap, currentPosition);
+        sumPoints = myGA->fitnessEval(currentPosition, positionMap, sumPoints, v);
+        v.clear();
+        check = count % timeCount;
+        if (check == 0 && count > 0) {
+          boolean = true;
+        }
+        count++;
+      }
+      newPop[j].fitness = sumPoints;
+      std::cout << "sumPoints" << i + 1 << " " << sumPoints << std::endl;
+      boolean = false;
+    }
+  }
+
+  std::cout << "Done" << std::endl;
+  myGA->printPopToFile(newPop);
+
 }
 
 int main(int argc, char const *argv[]) {

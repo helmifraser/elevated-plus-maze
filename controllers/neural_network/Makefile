@@ -25,11 +25,11 @@
 ###
 ### ---- C++ Sources ----
 ### if your program uses several C++ source files:
-### CXX_SOURCES = my_plugin.cc my_clever_algo.cpp my_graphics.c++
+ CXX_SOURCES = GA.cpp super.cpp pugixml.cpp neural_network.cpp
 ###
 ### ---- Compilation options ----
 ### if special compilation flags are necessary:
- CFLAGS = -std=c++11
+ CFLAGS = -std=c++14
 ###
 ### ---- Linked libraries ----
 ### if your program needs additional libraries:

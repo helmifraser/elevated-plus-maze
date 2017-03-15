@@ -2,12 +2,14 @@
 
 simulationControl::simulationControl() {
   timeStep = 32;
-  timeCount = 100; // 9375
+  timeCount = 4688; // 9375
   name = "E-puck";
   robot = getFromDef(name.c_str());
 
-  receiver = getReceiver("receiver");
-  receiver->enable(timeStep);
+  super_receiver = getReceiver("super_receiver");
+  super_receiver->enable(timeStep);
+
+  super_radio = getEmitter("super_radio");
 
   translation[0] = 0.0196607;
   translation[1] = 0.52;
@@ -26,61 +28,68 @@ simulationControl::simulationControl() {
   rotationField = robot->getField("rotation");
   keyboard = getKeyboard();
   keyboard->enable(timeStep);
+
+  // algo = new GA();
+
 }
 
 void simulationControl::run() {
-  // std::vector<float> data;
-  // data.clear();
-  std::string hello = "0.999 0.899 9 81";
+  // Individual test = algo->createIndividual();
 
   while (step(timeStep) != -1) {
-    int keyboardInput = keyboard->getKey();
-    // std::cout << "Get key" << std::endl;
-    switch (keyboardInput) {
-    case 49:
-      std::cout << "Demo" << std::endl;
-      getReceiverData(0);
-      getReceiverData(1);
-      std::cout << "data " << myString[0] << std::endl;
-      std::cout << "gps " << myString[1] << std::endl;
-      processReceiverData(myString[0], 0);
-      processReceiverData(myString[1], 1);
-      std::cout << "receiver data ";
-      for (size_t i = 0; i < sensorData.size(); i++) {
-        std::cout << sensorData[i] << " ";
-      }
-      std::cout << std::endl;
-
-      std::cout << "gps data ";
-      for (size_t i = 0; i < gpsData.size(); i++) {
-        std::cout << gpsData[i] << " ";
-      }
-      std::cout << std::endl;
-
-      break;
-    case 50:
-      std::cout << "Live" << std::endl;
-      live();
-      break;
-    }
+    // int keyboardInput = keyboard->getKey();
+    // // std::cout << "Get key" << std::endl;
+    // switch (keyboardInput) {
+    // case 49:
+    //   std::cout << "Demo" << std::endl;
+    //   getReceiverData(0);
+    //   getReceiverData(1);
+    //   std::cout << "data " << myString[0] << std::endl;
+    //   std::cout << "gps " << myString[1] << std::endl;
+    //   processReceiverData(myString[0], 0);
+    //   processReceiverData(myString[1], 1);
+    //   std::cout << "receiver data ";
+    //   for (size_t i = 0; i < sensorData.size(); i++) {
+    //     std::cout << sensorData[i] << " ";
+    //   }
+    //   std::cout << std::endl;
+    //
+    //   std::cout << "gps data ";
+    //   for (size_t i = 0; i < gpsData.size(); i++) {
+    //     std::cout << gpsData[i] << " ";
+    //   }
+    //   std::cout << std::endl;
+    //
+    //   break;
+    // case 50:
+    //   std::cout << "Live" << std::endl;
+    //   sendPacket(test);
+    //   // live();
+    //   break;
+    // }
+    live();
   }
+
+
 }
 
 void simulationControl::live() {
   int resetCount = 0;
+
   while (step(timeStep) != -1) {
     int check = count % timeCount;
-    std::cout << "count " << count << std::endl;
+    // std::cout << "count " << count << std::endl;
     if (check == 0 && count != 0) {
       robot->resetPhysics();
       translationField->setSFVec3f(translation);
       rotationField->setSFRotation(rotation);
-      std::cout << "reset" << std::endl;
+      // std::cout << "reset" << std::endl;
       resetCount++;
     }
     count++;
-    std::cout << "resetCount " << resetCount << std::endl;
+    // std::cout << "resetCount " << resetCount << std::endl;
   }
+
 }
 
 void simulationControl::processReceiverData(std::string data, int i) {
@@ -114,15 +123,31 @@ void simulationControl::processReceiverData(std::string data, int i) {
 void simulationControl::getReceiverData(int arrayIndex) {
   const size_t spartans = 400;
   Receiver *copy = (Receiver *)malloc(spartans);
-  for (int i = 0; i < receiver->getQueueLength(); i++) {
-    data = (char *)receiver->getData();
+  for (int i = 0; i < super_receiver->getQueueLength(); i++) {
+    data = (char *)super_receiver->getData();
     memcpy(copy, data, spartans);
     myString[arrayIndex] = (char *)copy;
-    receiver->nextPacket();
+    super_receiver->nextPacket();
   }
 }
 
-int main() {
+void simulationControl::sendPacket(Individual individual) {
+  std::string temp;
+
+    for (size_t z = 0; z < individual.size(); z++) {
+      for (size_t x = 0; x < individual[z].size(); x++) {
+        for (size_t c = 0; c < individual[z][x].size(); c++) {
+          temp.append(std::to_string(individual[z][x][c]));
+          temp.append(" ");
+        }
+      }
+    }
+
+  const char *message = temp.c_str();
+  super_radio->send(message, strlen(message) + 1);
+}
+
+int main(int argc, char const *argv[]) {
   std::cout << "Run" << std::endl;
   simulationControl *controller = new simulationControl();
   controller->run();

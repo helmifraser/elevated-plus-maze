@@ -10,12 +10,15 @@
 // own
 #include <array>
 #include <cmath>
+#include <math.h>
+#include <stdio.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <string.h>
 #include <regex>
 
+#include "GA.hpp"
 
 #define TIME_STEP 32
 
@@ -25,7 +28,7 @@ using Individual = std::vector<std::vector<std::vector<float>>>;
 
 class neural_network : public DifferentialWheels {
 private:
-  // Instantiating things we need
+  // Instantiating things we need in the controller
   DifferentialWheels *diffWheels;
   DistanceSensor *distanceSensors[8];
   Emitter *radio;
@@ -33,10 +36,17 @@ private:
   GPS *gps;
   LED *leds[8];
   Individual weights;
+  GA *myGA;
+
+  int popsize,timeCount, count, generations, tournamentSize;
+
+  float elitism, muteRate, severity;
 
   const char *data;
   std::string receivedWeights;
+  bool messageReceived;
 
+  float scaleVal(float parameters[4], float value);
   std::vector<float> activationFunc(std::vector<float> input);
   std::vector<float> layerCalc(std::vector<float> nodeOutputs,
                                std::vector<std::vector<float>> weights);
@@ -45,7 +55,7 @@ private:
   std::vector<float> getGPSValues();
   void getReceiverData();
   void processReceiverData(std::string data);
-
+  void printAll(Individual individual);
 
 
   public:

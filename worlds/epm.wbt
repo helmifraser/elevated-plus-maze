@@ -2,8 +2,8 @@
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.10547891 -0.93082232 -0.34992 2.7377215
-  position -0.78717927 2.1092229 -2.3791504
+  orientation -0.10629328 -0.93252534 -0.34510612 2.7273458
+  position -0.81144627 2.0902934 -2.3833428
 }
 Background {
   skyColor [
@@ -32,9 +32,11 @@ Supervisor {
   translation 0 2 0
   children [
     Emitter {
+      name "super_radio"
       channel 1
     }
     Receiver {
+      name "super_receiver"
     }
   ]
   controller "super"
@@ -51,6 +53,11 @@ Group {
               appearance Appearance {
                 material Material {
                   diffuseColor 0.5 0 0
+                }
+                texture ImageTexture {
+                  url [
+                    "textures/steel_floor.jpg"
+                  ]
                 }
               }
               geometry Box {
@@ -69,6 +76,11 @@ Group {
               appearance Appearance {
                 material Material {
                   diffuseColor 0.5 0 0
+                }
+                texture ImageTexture {
+                  url [
+                    "textures/steel_floor.jpg"
+                  ]
                 }
               }
               geometry Box {
@@ -328,6 +340,11 @@ Group {
           appearance Appearance {
             material Material {
               diffuseColor 1 0 0
+            }
+            texture ImageTexture {
+              url [
+                "textures/steel_floor.jpg"
+              ]
             }
           }
           geometry Box {

@@ -6,4 +6,5 @@ build/release/super.o: super.cpp super.hpp \
  /usr/local/webots/include/controller/cpp/webots/Supervisor.hpp \
  /usr/local/webots/include/controller/cpp/webots/Robot.hpp \
  /usr/local/webots/include/controller/cpp/webots/Receiver.hpp \
- /usr/local/webots/include/controller/cpp/webots/Device.hpp
+ /usr/local/webots/include/controller/cpp/webots/Device.hpp \
+ /usr/local/webots/include/controller/cpp/webots/Emitter.hpp

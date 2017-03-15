@@ -1,7 +1,8 @@
 // #include <webots/DistanceSensor.hpp>
 // #include <webots/GPS.hpp>
 
-#include "pugixml.hpp"
+// #include "pugixml.hpp"
+
 #include <algorithm>
 #include <ctime>
 #include <fstream>
@@ -17,6 +18,7 @@
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include <algorithm>
 
 
 #define TIME_STEP 32
@@ -40,8 +42,6 @@ private:
   void mutate(Individual &individual, float severity);
 
 public:
-  // std::vector<float> getDistanceValues();
-  // std::vector<float> getGPSValues();
   Population populate(int popsize);
   Individual createIndividual();
 
@@ -56,9 +56,9 @@ public:
   void sortByFitness(Population &population);
   Individual child(Individual parentA, Individual &parentB);
   void printIndividual(Individual individual);
-  void printPopToFile(Population population);
-  std::vector<std::string> parseFile(std::string filename, int popsize);
-  Individual returnFileWeights(std::vector<std::string> fileWeights);
+  // void printPopToFile(Population population);
+  // std::vector<std::string> parseFile(std::string filename, int popsize);
+  // Individual returnFileWeights(std::vector<std::string> fileWeights);
   Individual returnBestWeights(Individual individual);
 
 };
