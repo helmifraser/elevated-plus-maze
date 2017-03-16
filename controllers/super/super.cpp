@@ -1,5 +1,8 @@
 #include "super.hpp"
 
+// Class Performs overall simulation control
+
+// Initialises needed devices and variables
 simulationControl::simulationControl() {
   timeStep = 32;
   timeCount = 938; // 9375
@@ -11,6 +14,7 @@ simulationControl::simulationControl() {
 
   super_radio = getEmitter("super_radio");
 
+// set initial position
   translation[0] = 0.0196607;
   translation[1] = 0.52;
   translation[2] = -0.121699;
@@ -29,65 +33,40 @@ simulationControl::simulationControl() {
   keyboard = getKeyboard();
   keyboard->enable(timeStep);
 
-  // algo = new GA();
-
 }
 
 void simulationControl::run() {
-  // Individual test = algo->createIndividual();
-
   while (step(timeStep) != -1) {
-    // int keyboardInput = keyboard->getKey();
-    // // std::cout << "Get key" << std::endl;
-    // switch (keyboardInput) {
-    // case 49:
-    //   std::cout << "Demo" << std::endl;
-    //   getReceiverData(0);
-    //   getReceiverData(1);
-    //   std::cout << "data " << myString[0] << std::endl;
-    //   std::cout << "gps " << myString[1] << std::endl;
-    //   processReceiverData(myString[0], 0);
-    //   processReceiverData(myString[1], 1);
-    //   std::cout << "receiver data ";
-    //   for (size_t i = 0; i < sensorData.size(); i++) {
-    //     std::cout << sensorData[i] << " ";
-    //   }
-    //   std::cout << std::endl;
-    //
-    //   std::cout << "gps data ";
-    //   for (size_t i = 0; i < gpsData.size(); i++) {
-    //     std::cout << gpsData[i] << " ";
-    //   }
-    //   std::cout << std::endl;
-    //
-    //   break;
-    // case 50:
-    //   std::cout << "Live" << std::endl;
-    //   sendPacket(test);
-    //   // live();
-    //   break;
-    // }
+    std::cout << "timeStep " << timeStep << std::endl;
     live();
   }
 
-
 }
 
+// Resets the robot position to the initial position after a defined time interval.
+// Checks for a keyboard input ( 1 ) and if pressed sets the time interval to 5 minutes.
 void simulationControl::live() {
   int resetCount = 0;
 
   while (step(timeStep) != -1) {
+    int keyboardInput = keyboard->getKey();
+    switch (keyboardInput) {
+    case 49:
+      std::cout << "Demo" << std::endl;
+      timeCount = 9375;
+      break;
+    default:
+      break;
+    }
+
     int check = count % timeCount;
-    // std::cout << "count " << count << std::endl;
     if (check == 0 && count != 0) {
       robot->resetPhysics();
       translationField->setSFVec3f(translation);
       rotationField->setSFRotation(rotation);
-      // std::cout << "reset" << std::endl;
       resetCount++;
     }
     count++;
-    // std::cout << "resetCount " << resetCount << std::endl;
   }
 
 }

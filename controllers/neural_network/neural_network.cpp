@@ -1,5 +1,7 @@
 #include "neural_network.hpp"
 
+// Initialise needed devices and variables
+// NOTE: GPS is not used for robot control
 neural_network::neural_network() {
   gps = getGPS("gps");
   gps->enable(TIME_STEP);
@@ -15,24 +17,28 @@ neural_network::neural_network() {
   std::string ps = "ps";
   std::string led = "led";
 
+  // Enable distance sensors and LEDS
   for (int i = 0; i < 8; i++) {
     distanceSensors[i] = getDistanceSensor(ps.replace(2, 1, std::to_string(i)));
     distanceSensors[i]->enable(TIME_STEP);
     leds[i] = getLED(led.replace(3, 1, std::to_string(i)));
   }
 
+  // Create a GA object and assign parameters
   myGA = new GA();
   popsize = 50;
-  generations = 20;
-  tournamentSize = 5;
+  generations = 50;
+  tournamentSize = 3;
   elitism = 0.2;
   muteRate = 0.02;
   severity = 0.4;
 
+  // Set the time limit for a single individual run
   timeCount = 938;
   count = 0;
 }
 
+// Allows the NN to send data to a supervisor
 void neural_network::sendPacket(std::vector<float> sensorValues) {
   std::vector<float> packet = sensorValues;
   std::string temp, othertemp;
@@ -44,6 +50,7 @@ void neural_network::sendPacket(std::vector<float> sensorValues) {
   radio->send(message, strlen(message) + 1);
 }
 
+// Allows the NN to receive data to a supervisor
 void neural_network::getReceiverData() {
   const size_t spartans = 400;
   Receiver *copy = (Receiver *)malloc(spartans);
@@ -55,9 +62,11 @@ void neural_network::getReceiverData() {
   }
 }
 
+// Processess received data and saves it into a global variable. String -> weights
 void neural_network::processReceiverData(std::string data) {
   messageReceived = false;
   try {
+    // Searches the string for a regular expression
     std::regex re("[*0-9*.*0-9*]+|[-][*0-9*.*0-9*]+");
     std::sregex_iterator next(data.begin(), data.end(), re);
     std::sregex_iterator end;
@@ -99,6 +108,7 @@ void neural_network::processReceiverData(std::string data) {
   }
 }
 
+// Reads the raw IR sensor values and saves them to a vector
 std::vector<float> neural_network::getDistanceSensorValues() {
   std::vector<float> distanceSensorsValues;
   for (int i = 0; i < 8; i++) {
@@ -107,6 +117,7 @@ std::vector<float> neural_network::getDistanceSensorValues() {
   return distanceSensorsValues;
 }
 
+// Reads the GPS sensor values and saves them to a vector
 std::vector<float> neural_network::getGPSValues() {
   const double *dataGPS = gps->getValues();
   std::vector<float> GPSout;
@@ -117,16 +128,16 @@ std::vector<float> neural_network::getGPSValues() {
   return GPSout;
 }
 
+// tanh() activation function for the neurons
 std::vector<float> neural_network::activationFunc(std::vector<float> input) {
   std::vector<float> out;
-
   for (size_t i = 0; i < input.size(); i++) {
     out.push_back(tanh(input[i]));
   }
-
   return out;
 }
 
+// Given a set of inputs and a set of layer weights, calculates the output of a layer
 std::vector<float>
 neural_network::layerCalc(std::vector<float> nodeOutputs,
                           std::vector<std::vector<float>> weightLayer) {
@@ -144,6 +155,7 @@ neural_network::layerCalc(std::vector<float> nodeOutputs,
   return activationFunc(layerOutput);
 }
 
+// Given a set of inputs and a set of weights, calculates the output of the network
 std::vector<float> neural_network::getOutputs(std::vector<float> inputs,
                                               Individual weights) {
 
@@ -158,6 +170,9 @@ std::vector<float> neural_network::getOutputs(std::vector<float> inputs,
   return outputLayer;
 }
 
+
+// Scales the value of the IR sensor to those needed for the network. -2.5 -> 2.5
+// parameters = {old minimum, old minimum, desired minimum, desired maximum}
 float neural_network::scaleVal(float parameters[4], float value) {
   float out = (((parameters[3] - parameters[2]) * (value - parameters[0])) /
                (parameters[1] - parameters[0])) +
@@ -172,6 +187,7 @@ float neural_network::scaleVal(float parameters[4], float value) {
   return out;
 }
 
+// Prints a set of weights (individual) to the console
 void neural_network::printAll(Individual individual) {
   for (size_t z = 0; z < individual.size(); z++) {
     for (size_t x = 0; x < individual[z].size(); x++) {
@@ -184,6 +200,7 @@ void neural_network::printAll(Individual individual) {
   }
 }
 
+// "main" of the neural network. Performs evolution.
 void neural_network::run() {
   std::vector<float> vals, dist, wheelSpeeds;
 
@@ -195,6 +212,7 @@ void neural_network::run() {
   float scaleParam[4] = {50, 1000, -2.5, 2.5};
   std::vector<float> v;
 
+// Create new pop
   Population population = myGA->populate(popsize);
   Population newPop;
 
@@ -210,28 +228,38 @@ void neural_network::run() {
       }
 
       wheelSpeeds.clear();
+      // calculates the wheel speeds based in NN inputs
       wheelSpeeds = getOutputs(v, population[j].individual);
       setSpeed(wheelSpeeds[0], wheelSpeeds[1]);
 
+    // calculates position for GPS values
+    // NOTE: NOT USED FOR THE CONTROLLER. ONLY FOR GA FITNESS EVALUATION.
       currentPosition = myGA->position(vals);
       myGA->updatePosition(positionMap, currentPosition);
 
+    // calculates fitness
       sumPoints = myGA->fitnessEval(currentPosition, positionMap, sumPoints, v);
       v.clear();
 
+    // checks if the time limit has been reached
       check = count % timeCount;
       if (check == 0 && count > 0) {
         boolean = true;
       }
       count++;
     }
+    // saves the fitness of the individual and pegs it to the individual
     population[j].fitness = sumPoints;
     std::cout << "sumPoints"
               << " " << 0 << " " << sumPoints << std::endl;
     boolean = false;
   }
   for (int i = 0; i < generations - 1; i++) {
+    // evolves the next generation, given the previous population, size of tournament selection
+    // and rate of elitism. Uses uniform crossover.
     newPop = myGA->createNewGen(population, tournamentSize, elitism);
+    // performs a normally distributed mutation given a population, rate of mutation in population
+    // and the severity of mutation
     myGA->mutateGen(newPop, muteRate, severity);
     for (int j = 0; j < popsize; j++) {
       sumPoints = 0;
@@ -263,13 +291,15 @@ void neural_network::run() {
       boolean = false;
     }
   }
-
+  // sorts the final generation by fitness in descending order
   myGA->sortByFitness(newPop);
 
   std::cout << "Done" << std::endl;
+  // saves the final generation to a file for analysis and reuse
   myGA->printPopToFile(newPop);
 }
 
+// Chooses which mode to do
 void neural_network::keyboardSelect() {
   std::cout << "Select. 1 for demo, 2 for evolution" << std::endl;
   while (step(TIME_STEP) != -1) {
@@ -277,6 +307,7 @@ void neural_network::keyboardSelect() {
     switch (keyboardInput) {
       case 49:
       std::cout << "Demo" << std::endl;
+      popsize = 50;
       demo();
       break;
       case 50:
@@ -287,6 +318,7 @@ void neural_network::keyboardSelect() {
   }
 }
 
+// Takes in an .xml file of weights and runs the best controller forever
 void neural_network::demo() {
   std::cout << "Parsing file" << std::endl;
   std::string filename = "weights.xml";

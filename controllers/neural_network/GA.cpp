@@ -1,6 +1,7 @@
 #include "GA.hpp"
 #include <algorithm>
 
+// Sets the rewards/punishents for each area in the map
 std::map<int, int> GA::points() {
   std::map<int, int> pointsMap = {{0, -50}, {1, 5},   {2, 20},   {3, 40},
                                   {4, 20},   {5, 5},   {6, -10},  {7, -15},
@@ -9,10 +10,9 @@ std::map<int, int> GA::points() {
   return pointsMap;
 }
 
+// Sets the rewards/punishents for each area in the map
 std::map<std::string, float> sensorPoints = {{"reward", 0.25},
                                              {"punishment", -10}};
-// std::map<std::string, float> exploreFam = {{"reward", 1},
-//                                              {"punishment", -3}};
 
 void GA::printAll(Individual individual) {
   for (int z = 0; z < individual.size(); z++) {
@@ -36,6 +36,7 @@ Individual GA::returnBestWeights(Individual individual) {
   return bestWeights;
 }
 
+// Generates a random population of a given popsize
 Population GA::populate(int popsize) {
   Population population;
   population.clear();
@@ -51,6 +52,7 @@ Population GA::populate(int popsize) {
   return population;
 }
 
+// Creates an individual. Used to create a population.
 Individual GA::createIndividual() {
   Individual individual;
   std::vector<std::vector<float>> layerOne, layerTwo;
@@ -75,6 +77,7 @@ Individual GA::createIndividual() {
   return individual;
 }
 
+// Creates a row of random numbers for a weight layer's matricx
 // 0 - min of range, 1 - max of range, 2 size of vector
 std::vector<float> GA::createRow(int parameters[3]) {
   // First create an instance of an engine.
@@ -90,6 +93,7 @@ std::vector<float> GA::createRow(int parameters[3]) {
   return vec;
 }
 
+// Given two parents, performs uniform crossover
 Individual GA::child(Individual parentA, Individual &parentB) {
 
   std::random_device rnd_device;
@@ -110,6 +114,8 @@ Individual GA::child(Individual parentA, Individual &parentB) {
   return parentA;
 }
 
+// Given a population, a rate of mutation and the sevrity of mutation, mutates the
+// population
 void GA::mutateGen(Population &population, float mutateRate, float severity) {
   std::random_device rnd_device;
   std::default_random_engine generator(rnd_device());
@@ -122,6 +128,7 @@ void GA::mutateGen(Population &population, float mutateRate, float severity) {
   }
 }
 
+// Mutates an individual given the severity of mutation
 void GA::mutate(Individual &individual, float severity) {
   std::random_device rnd_device;
   std::default_random_engine generator(rnd_device());
@@ -147,23 +154,10 @@ void GA::mutate(Individual &individual, float severity) {
   }
 }
 
+// Calculates the fitness of the individual as a function of current position and sensor values
 float GA::fitnessEval(int currentPosition, int position[15], float sumPoints, std::vector<float> sensorValues) {
-  int max = position[0], difference = 0, average = 0, sum_average = 0;
-  for (int i = 0; i < 15; i++) {
-    sum_average += position[i];
-    if (position[i] > max) {
-      max = position[i];
-    }
-  }
-  average = sum_average / 15;
-  difference = max - average;
-
   std::map<int, int> map = points();
-  // if (difference > average / 2) {
-    sumPoints += map[currentPosition] /*+ exploreFam["punishment"]*/;
-  // } else {
-  //  sumPoints += map[currentPosition] + exploreFam["reward"];
-  //}
+    sumPoints += map[currentPosition];
   for (int i = 0; i < 8; i++) {
     if (sensorValues[i] >= 1.71 || sensorValues[i] < 0.1) {
       sumPoints += sensorPoints["punishment"];
@@ -175,6 +169,7 @@ float GA::fitnessEval(int currentPosition, int position[15], float sumPoints, st
   return sumPoints;
 }
 
+// Given a population, a tournament size and a rate of elitism, performs reproduction
 Population GA::createNewGen(Population &population, int tournamentSize,
                             float elitism) {
   sortByFitness(population);
@@ -220,6 +215,7 @@ Population GA::createNewGen(Population &population, int tournamentSize,
   return new_population;
 }
 
+// Sorts the population in descending order of fitness (highest first)
 void GA::sortByFitness(Population &population) {
   std::sort(population.begin(), population.end(),
             [](const auto &i, const auto &j) { return i.fitness > j.fitness; });
@@ -229,6 +225,8 @@ void GA::updatePosition(int (&position)[15], int currentPosition) {
   position[currentPosition - 1]++;
 }
 
+// Checks the current coordinates of the robot and returns the sector of the map
+// that it is occupying
 int GA::position(std::vector<float> coordinates) {
   int current = 0;
   float x = coordinates[0];
@@ -239,24 +237,18 @@ int GA::position(std::vector<float> coordinates) {
   int count = 5;
 
   if ((x <= 0.07) & (x >= -0.07) & (z >= -1.09) & (z < 0)) {
-    //  std::cout << "here1" << std::endl;
     for (int i = 0; i < count; i++) {
       if ((z <= temp) & (z > temp - 0.23)) {
         current = i + 1;
         i = 5;
-        //    std::cout << "here2" << std::endl;
       }
-      // std::cout << "here3" << std::endl;
       temp = temp - 0.23;
     }
   } else if ((z >= -0.689) & (z < -0.46)) {
-    // std::cout << "here4" << std::endl;
     if ((x > 0)) {
-      // temp = 0.097;
       temp = 0.066;
       for (int i = 0; i < count; i++) {
         if ((x >= temp) & (x < temp + 0.1)) {
-          //  std::cout << "here5" << std::endl;
           current = i + 6;
           i = 5;
         }
@@ -269,7 +261,6 @@ int GA::position(std::vector<float> coordinates) {
         if ((x <= temp) & (x > temp - 0.1)) {
           current = i + 11;
           i = 5;
-          //  std::cout << "here6" << std::endl;
         }
         temp = temp - 0.1;
       }
@@ -281,6 +272,7 @@ int GA::position(std::vector<float> coordinates) {
 
 int roundNum(float x) { return floor(x * 100 + 0.5) / 100; }
 
+// Prints the population to an .xml file
 void GA::printPopToFile(Population population) {
   std::string filename = "weights.xml";
 
@@ -290,7 +282,6 @@ void GA::printPopToFile(Population population) {
 
   str.append("<nodes>");
   for (int i = 0; i < population.size(); i++) {
-    std::cout << i << std::endl;
     std::string node1 = "<node" + std::to_string(i) + "> ";
     str.append(node1);
     for (int j = 0; j < population[i].individual.size(); j++) {
@@ -319,6 +310,7 @@ void GA::printPopToFile(Population population) {
             << std::endl;
 }
 
+// Reads the .xml and returns a string of the weights
 std::vector<std::string> GA::parseFile(std::string filename, int popsize) {
   std::vector<std::string> layerWeights;
   pugi::xml_document doc;
@@ -327,7 +319,6 @@ std::vector<std::string> GA::parseFile(std::string filename, int popsize) {
 
   for (int i = 0; i < popsize; i++) {
     std::string nodeNum = "node" + std::to_string(i);
-    std::cout << "Weight " << i << std::endl;
     std::string layerone = doc.child("nodes")
                                .child(nodeNum.c_str())
                                .child("layer0")
@@ -344,6 +335,8 @@ std::vector<std::string> GA::parseFile(std::string filename, int popsize) {
 
   return layerWeights;
 }
+
+// Given a vector of strings (file weights), returns an Individual
 Individual GA::returnFileWeights(std::vector<std::string> fileWeights) {
   Individual weights;
   std::vector<float> row;
