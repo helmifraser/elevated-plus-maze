@@ -1,15 +1,10 @@
 \begin{thebibliography}{1}
 
-\bibitem{Costa201444}
-Ariadne~A. Costa, Silvio Morato, Antonio~C. Roque, and Renato Tinós.
-\newblock A computational model for exploratory activity of rats with different
-  anxiety levels in elevated plus-maze.
-\newblock {\em Journal of Neuroscience Methods}, 236:44 -- 50, 2014.
-
-\bibitem{Costa2016102}
-Ariadne de~Andrade~Costa and Renato Tinós.
-\newblock Investigation of rat exploratory behavior via evolving artificial
-  neural networks.
-\newblock {\em Journal of Neuroscience Methods}, 270:102 -- 110, 2016.
+\bibitem{montgomery}
+K.~C. Montgomery.
+\newblock The relation between fear induced by novel stimulation and
+  exploratory drive.
+\newblock {\em Journal of Comparative and Physiological Psychology}, 48(4):254
+  -- 260, 1955.
 
 \end{thebibliography}
