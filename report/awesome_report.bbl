@@ -1,9 +1,15 @@
 \begin{thebibliography}{1}
 
-\bibitem{Figueredo:2009dg}
-A.~J. Figueredo and P.~S.~A. Wolf.
-\newblock Assortative pairing and life history strategy - a cross-cultural
-  study.
-\newblock {\em Human Nature}, 20:317--330, 2009.
+\bibitem{Costa201444}
+Ariadne~A. Costa, Silvio Morato, Antonio~C. Roque, and Renato Tinós.
+\newblock A computational model for exploratory activity of rats with different
+  anxiety levels in elevated plus-maze.
+\newblock {\em Journal of Neuroscience Methods}, 236:44 -- 50, 2014.
+
+\bibitem{Costa2016102}
+Ariadne de~Andrade~Costa and Renato Tinós.
+\newblock Investigation of rat exploratory behavior via evolving artificial
+  neural networks.
+\newblock {\em Journal of Neuroscience Methods}, 270:102 -- 110, 2016.
 
 \end{thebibliography}
