@@ -1,54 +1,56 @@
 \section{Implementation}
 
-\lipsum[10] % Dummy text
+\subsection{Arena setup}
 
-\subsection{Subsection}
+In the model implemented, an ANN with fixed architecture was used, see Fig. \ref{fig:NN}. A genetic algorithm was used to optimise the weights of the ANN, evolving the desired rat behaviour. 
 
-\lipsum[11] % Dummy text
+The simulated elevated plus maze was discretised into 15 positions as shown in Fig. \ref{fig:arena-disc}. This was inspired by a similar, proven solution detailed within \citeauthor{Costa201444} and \citeauthor{Costa2016102}. \cite{Costa201444} \cite{Costa2016102} GPS ranges from the E-puck were assigned EPM positions in order to provide the robot's position to the supervisor.
 
-\begin{table}[hbt]
-\caption{Table of Grades}
-\centering
-\begin{tabular}{llr}
-\toprule
-\multicolumn{2}{c}{Name} \\
-\cmidrule(r){1-2}
-First name & Last Name & Grade \\
-\midrule
-John & Doe & $7.5$ \\
-Richard & Miles & $2$ \\
-\bottomrule
-\end{tabular}
-\label{tab:label}
-\end{table}
 
-\subsubsection{Subsubsection}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{arena-disc}
+	\caption{Arena boundaries}
+	\label{fig:arena-disc}
+\end{figure}
 
-\lipsum[12] % Dummy text
+\subsection{Robot controller}
 
-\begin{description}
-\item[Word] Definition
-\item[Concept] Explanation
-\item[Idea] Text
-\end{description}
+The e-puck is controlled by a multilayer perceptron (MLP), shown in Fig. \ref{fig:NN} with arrows representing weighted links. 
 
-\subsubsection{Subsubsection}
+The network's inputs are data from the circumferential IR proximity sensors. The outputs of the network specify wheel speed values. 
 
-\lipsum[13] % Dummy text
+In terms of activation functions, every neuron uses a hyperbolic tangent function. This suited this application as this function’s output is between -1 and 1, which is ideal because wheel speeds can be negative. The output values are scaled by 1000, to match the possible range of values in wheel speeds.
 
-\begin{itemize}[noitemsep] % [noitemsep] removes whitespace between the items for a compact look
-\item First item in a list
-\item Second item in a list
-\item Third item in a list
-\end{itemize}
+Each layer of synaptic weights is represented by an N-by-N matrix, where each row is a neuron's connection's weights to the next layer. \cite{Seiffert2001} These individual sets of weights are encoded into another data structure, which contain the weights of each layer. 
 
-\subsubsection{Subsubsection}
+\subsection{Evolution}
 
-\lipsum[14] % Dummy text
+The network's weights are optimised by a genetic algorithm. 
 
-\subsection{Subsection}
+Each individual of the population is evaluated by the GA. As stated, each individual is a separate robot controller (ANN), with different parameters (weights).
 
-\lipsum[15-23] % Dummy text
+The population is initialised via a function that fills a matrix with uniformly distributed random numbers in the range of -1 to 1, which are the initial weights. The size of the initial population is dictated by the variable \emph{popsize}. 
 
-%------------------------------------------------
-\phantomsection
+The fitness of each individual is evaluated with a fitness function. At each time step, this takes in as input the position of the robot and the proximity sensor values. The fitness value assigned to a controller under evaluation is increased or decreased depending on whether it exhibited desirable or undesirable behaviour. The algorithm awards ``rat-like'' behaviour such as predominantly staying within the confines of the enclosure (anxious exploratory behaviour) and close to walls, and punishes falling off the arena, exploring the outer boundaries of the arm and wall collisions.
+
+Each individual is evaluated after navigating through the virtual EPM for 30 seconds.
+
+Successive generations are created through selection and reproduction of the previous generation.
+
+Based on the fitness of these individuals, the best individuals are selected by elitism and the remaining individuals are selected through tournament selection. 
+
+In elitism, a proportion of the best individuals are copied directly to the new generation, and the percentage for which this is done is dictated by the variable \textit{elitism}. 
+
+In tournament selection, a number of individuals are chosen randomly, according to the variable \textit{tournamentSize}. These individuals are sorted by their fitness and the best two are chosen as parents. 
+
+A new individual is reproduced using uniform crossover. In uniform crossover, there is a 50\% probability that the current gene is selected from one parent and not the other. 
+
+Gaussian mutation is also applied with a probability dictated by the variable \textit{muteRate} (i.e. the number of individuals in a generation to be mutated) and with severity dictated by the variable \textit{severity} (i.e. the number of genes in the individual to be mutated). The variables mentioned above are all user definable.
+
+When the best controller is evolved, the final generation of individuals is sorted by fitness and saved to an .xml file for analysis and reuse.
+
+\subsection{Simulation supervisor}
+
+The supervisor acts as a tool to guide and control the simulation. The user first sets the desired mode of operation (demo or evolution). Then the supervisor sets the time step of the current simulation as well as the duration of time each controller should run for, and resets the robot to its initial position.  
+

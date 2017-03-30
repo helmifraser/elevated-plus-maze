@@ -1,3 +1,24 @@
 \section{Discussion} % The \section*{} command stops section numbering
-Discussion
+
+One of the first challenges faced was how to keep track of the position of the robot. Since the robot's position is required to evaluate the fitness of the controller, this was important. 
+
+Due to its accuracy and ease of implementation, a GPS unit was decided upon. However an alternative would be to change the colour of the maze floor and use the ground sensors to detect the change in colour. In this way, the maze could still be discretised into zones. 
+
+Using the method implemented, however, dividing the map into more positions could evolve a better controller.
+
+Possibly, this method would be cheaper to implement in a real robot, since indoor GPS equipment is expensive. In addition, the ground sensors could be used to detect the absence of a floor at the edge of the unenclosed spaces, which would be analogous to a rat's whiskers. 
+
+The neural network topology if fixed, however different architectures were considered.
+
+A recurrent network was contemplated; however, this would have increased the complexity of both neural network computation and behavioural evolution. In addition to this, the running speed could be effected. However, more hidden layers and recurrence would represent more memory and information processing capability and would possibly result in evolving a good solution quicker. In addition to this, simultaneously evolving the weights, the architecture of the ANN, and the activation function would yield better results, at the cost of time and complexity.
+ 
+Having fewer input nodes in the ANN and using less IR sensors on the robot was also considered, as rats use mostly the whiskers and eyes to gauge their environment.
+
+Different numbers of outputs were considered too, such as four outputs, each representing a particular action for the robot to take, such as forward, left, right and stay in the same place. The final behaviour may have been more robotic than the one in our case, but the controller may have evolved quicker. 
+
+Initially, the ANN was running on the robot, and the GA was running separately, through the supervisor. A two-way communication network was implemented wihtin the simulation, with the supervisor transmitting the weights to be tested to the robot and the robot transmitting its GPS co-ordinates to the supervisor. Unfortunately, this resulted in an extremely slow running speed, even using the simulation's ``fast mode''. Therefore, it was decided that the GA should run on the robot too. This increased the simulation speed ten fold. It wasthought this was probably due to the removal of the emitter and receiver previously needed when transmitting data between the robot and the supervisor.
+ 
+For the fitness function, an extra component was implemented, which recorded the number of times the e-puck visited each position, and punished the individual if it visited one position frequently and never visited others. However, this seemed to have no effect on the evolution of the controller, and it was decided that assigning more points to positions further away from the starting position was simpler and more effective.
+
+For more robust evolution, the robot's initial starting position could also be altered.
 

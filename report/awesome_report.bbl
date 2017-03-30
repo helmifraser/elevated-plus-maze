@@ -1,10 +1,120 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{13}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem{montgomery}
+\bibitem[Montgomery(1955)]{Montgomery1955}
 K.~C. Montgomery.
-\newblock The relation between fear induced by novel stimulation and
-  exploratory drive.
-\newblock {\em Journal of Comparative and Physiological Psychology}, 48(4):254
-  -- 260, 1955.
+\newblock {The relation between fear induced by novel stimulation and
+  exploratory drive.}
+\newblock \emph{Journal of Comparative and Physiological Psychology},
+  48\penalty0 (4):\penalty0 254--260, 1955.
+\newblock ISSN 0021-9940.
+\newblock \doi{10.1037/h0043788}.
+\newblock URL \url{http://content.apa.org/journals/com/48/4/254}.
+
+\bibitem[Carter and Shieh(2010)]{Carter2010}
+Matt Carter and Jennifer~C. Shieh.
+\newblock {Animal Behavior}.
+\newblock In \emph{Guide to Research Techniques in Neuroscience}, pages 39--71.
+  Elsevier, 2010.
+\newblock \doi{10.1016/B978-0-12-374849-2.00002-1}.
+\newblock URL
+  \url{http://linkinghub.elsevier.com/retrieve/pii/B9780123748492000021}.
+
+\bibitem[Walf and Frye(2007)]{Walf2007}
+Alicia~A Walf and Cheryl~A Frye.
+\newblock {The use of the elevated plus maze as an assay of anxiety-related
+  behavior in rodents.}
+\newblock \emph{Nature protocols}, 2\penalty0 (2):\penalty0 322--8, 2007.
+\newblock ISSN 1750-2799.
+\newblock \doi{10.1038/nprot.2007.44}.
+\newblock URL \url{http://dx.doi.org/10.1038/nprot.2007.44}.
+
+\bibitem[Lister(1987)]{Lister1987}
+Richard~G Lister.
+\newblock {The use of a plus-maze to measure anxiety in the mouse.}
+\newblock \emph{Psychopharmacology}, 92\penalty0 (2):\penalty0 180--185, 1987.
+\newblock ISSN 0033-3158.
+\newblock \doi{10.1007/BF00177912}.
+
+\bibitem[Komada et~al.(2008)Komada, Takao, and Miyakawa]{Komada2008}
+Munekazu Komada, Keizo Takao, and Tsuyoshi Miyakawa.
+\newblock {Elevated plus maze for mice}.
+\newblock \emph{Journal of visualized experiments : JoVE}, \penalty0
+  (22):\penalty0 1--4, 2008.
+\newblock ISSN 1940-087X.
+\newblock \doi{10.3791/1088}.
+\newblock URL
+  \url{http://www.pubmedcentral.nih.gov/articlerender.fcgi?artid=2762911{\&}tool=pmcentrez{\&}rendertype=abstract}.
+
+\bibitem[Mondada et~al.(2009)Mondada, Bonani, Raemy, Pugh, Cianci, Klaptocz,
+  Magnenat, Zufferey, Floreano, and Martinoli]{epfl-epuck}
+F.~Mondada, M.~Bonani, X.~Raemy, J.~Pugh, C.~Cianci, A.~Klaptocz, S.~Magnenat,
+  J.~Zufferey, D.~Floreano, and A.~Martinoli.
+\newblock The e-puck, a robot designed for education in engineering.
+\newblock \emph{Proceedings of the 9th Conference on Autonomous Robot Systems
+  and Competitions, vol. 1, num. 1, p. 59-65}, 2009.
+
+\bibitem[Michel(2004)]{Michel2004}
+Olivier Michel.
+\newblock {Webots TM : Professional Mobile Robot Simulation}.
+\newblock \emph{International Journal of Advanced Robotic Systems}, 1\penalty0
+  (1):\penalty0 39--42, 2004.
+\newblock ISSN 1729-8806.
+\newblock \doi{10.1.1.86.1278}.
+
+\bibitem[Russell and Norvig(2009)]{Russell2009}
+Stuart Russell and Peter Norvig.
+\newblock \emph{{Artificial Intelligence: A Modern Approach, 3rd edition}}.
+\newblock 2009.
+\newblock ISBN 9780136042594.
+\newblock \doi{10.1017/S0269888900007724}.
+\newblock URL
+  \url{http://portal.acm.org/citation.cfm?id=1671238{\&}coll=DL{\&}dl=GUIDE{\&}CFID=190864501{\&}CFTOKEN=29051579{\%}5Cnpapers2://publication/uuid/4B787E16-89F6-4FF7-A5E5-E59F3CFEFE88}.
+
+\bibitem[Haykin(2008)]{Haykin2008}
+Simon Haykin.
+\newblock \emph{{Neural Networks and Learning Machines}}, volume~3.
+\newblock 2008.
+\newblock ISBN 9780131471399.
+\newblock \doi{978-0131471399}.
+
+\bibitem[Fraser and Burnell(1970)]{Fraser1970}
+A~Fraser and D~Burnell.
+\newblock \emph{{COMPUTER MODELS IN GENETICS}}.
+\newblock New York: McGraw-Hill, 1970.
+\newblock ISBN 0070219044.
+
+\bibitem[Costa et~al.(2014)Costa, Morato, Roque, and Tinós]{Costa201444}
+Ariadne~A. Costa, Silvio Morato, Antonio~C. Roque, and Renato Tinós.
+\newblock A computational model for exploratory activity of rats with different
+  anxiety levels in elevated plus-maze.
+\newblock \emph{Journal of Neuroscience Methods}, 236:\penalty0 44 -- 50, 2014.
+\newblock ISSN 0165-0270.
+\newblock \doi{http://dx.doi.org/10.1016/j.jneumeth.2014.08.006}.
+\newblock URL
+  \url{http://www.sciencedirect.com/science/article/pii/S0165027014002908}.
+
+\bibitem[Costa and Tinós(2016)]{Costa2016102}
+Ariadne~A. Costa and Renato Tinós.
+\newblock Investigation of rat exploratory behavior via evolving artificial
+  neural networks.
+\newblock \emph{Journal of Neuroscience Methods}, 270:\penalty0 102 -- 110,
+  2016.
+\newblock ISSN 0165-0270.
+\newblock \doi{http://dx.doi.org/10.1016/j.jneumeth.2016.06.010}.
+\newblock URL
+  \url{http://www.sciencedirect.com/science/article/pii/S0165027016301315}.
+
+\bibitem[Seiffert(2001)]{Seiffert2001}
+Udo Seiffert.
+\newblock {Multiple Layer Perceptron training using genetic algorithms}.
+\newblock \emph{European symposium on artificial neural networks}, 9:\penalty0
+  159--164, 2001.
+\newblock URL
+  \url{https://www.elen.ucl.ac.be/Proceedings/esann/esannpdf/es2001-460.pdf}.
 
 \end{thebibliography}

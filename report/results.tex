@@ -1,4 +1,27 @@
 \section{Results} % The \section*{} command stops section numbering
 
-Results
+A controller which mimicked the approach-avoidance behaviour of a rat in the EPM was successfully evolved.
+
+With this controller, the virtual rat moves along the enclosed walls as it explores the maze, peeks onto the unenclosed positions but slowly turns away back into the enclosed space.
+
+Shown in  Table \ref{tab:param} are the algorithm parameters used during evolution.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{llr}
+		\toprule
+		\multicolumn{2}{c}{Variables} \\
+		\cmidrule(r){1-2}
+		popsize & 50\\
+		generations & 50\\
+		tournamentSize & 3 \\
+		elitism & 0.2\\
+		muteRate & 0.02\\
+		severity & 0.4\\
+		\bottomrule
+	\end{tabular}
+	\caption{Genetic Algorithm Parameters}
+	\label{tab:param} 	
+\end{table}
+
 
